@@ -1,71 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>iHeart — 3D Analysis &amp; Visualization</title>
-    <meta name="description" content="iHeart — 3D analysis and visualization for echocardiography.">
-    <meta name="keywords" content="iHeart, 3D echocardiography, 3D analysis, cardiac visualization, 3Decho">
-    <meta name="theme-color" content="#f7f9fc">
-    <meta property="og:title" content="iHeart — 3D Analysis &amp; Visualization">
-    <meta property="og:description" content="3D analysis and visualization for echocardiography.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://iheart-3decho.github.io/">
-    <link rel="canonical" href="https://iheart-3decho.github.io/">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <style>
-      :root { color-scheme: light; --ink: #172a46; --muted: #63758b; --blue: #2465c4; }
-      * { box-sizing: border-box; }
-      body { margin: 0; background: #f7f9fc; color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
-      .site { max-width: 1280px; margin: auto; padding: 0 64px; }
-      header { height: 108px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dfe6ef; }
-      .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 650; letter-spacing: -.6px; }
-      .brand img { width: 30px; height: 30px; }
-      a { color: var(--muted); text-decoration: none; font-size: 14px; }
-      a:hover { color: var(--blue); }
-      a:focus-visible { outline: 2px solid var(--blue); outline-offset: 6px; border-radius: 2px; }
-      main { min-height: calc(100svh - 188px); display: grid; grid-template-columns: 1.4fr 1fr; align-items: center; gap: 36px; padding: 80px 0; }
-      .eyebrow { font-size: 11px; font-weight: 650; letter-spacing: 2.1px; color: var(--muted); text-transform: uppercase; margin: 0 0 26px; }
-      h1 { margin: 0; font-size: clamp(74px, 9vw, 124px); line-height: 1.05; font-weight: 650; letter-spacing: -.075em; }
-      h1 span { color: var(--blue); }
-      .subtitle { margin: 28px 0 0; font-size: clamp(19px, 2.2vw, 28px); font-weight: 400; letter-spacing: -.5px; line-height: 1.5; }
-      .accent { width: 54px; height: 3px; background: var(--blue); margin-top: 42px; }
-      .space { position: relative; width: 100%; aspect-ratio: 1; max-width: 370px; justify-self: end; border-radius: 50%; background: radial-gradient(circle, #e5edf9 0, #edf2fa 40%, #f7f9fc 70%); }
-      .space::before { content: ""; position: absolute; inset: 13%; border: 1px solid #b2c7e5; border-radius: 50%; }
-      .orbit { position: absolute; inset: 13%; border: 1px solid #779fcf; border-radius: 50%; transform: rotate(-28deg) scaleX(.44); }
-      .orbit.two { transform: rotate(32deg) scaleX(.64); border-color: #a0b9da; }
-      .orbit.three { transform: rotate(75deg) scaleX(.4); border-color: #a0b9da; }
-      .point { position: absolute; top: 22%; left: 30%; width: 9px; height: 9px; background: var(--blue); border: 2px solid #f7f9fc; border-radius: 50%; }
-      footer { min-height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #dfe6ef; color: var(--muted); font-size: 12px; }
-      footer p { margin: 0; }
-      @media (max-width: 700px) {
-        .site { padding: 0 28px; }
-        header { height: 84px; }
-        main { min-height: calc(100svh - 156px); grid-template-columns: 1fr; padding: 58px 0 42px; gap: 30px; }
-        .eyebrow { font-size: 10px; letter-spacing: 1.5px; margin-bottom: 22px; }
-        .subtitle { margin-top: 20px; }
-        .accent { margin-top: 28px; }
-        .space { width: 190px; justify-self: end; margin-top: -15px; }
-        footer { min-height: 72px; }
-      }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f7fa" />
+    <meta
+      name="description"
+      content="心臟能泵出多少血？iHeart 從心臟超聲影片找對畫面、畫出輪廓、量出指標，讓每個數值都有可回看的影像依據。"
+    />
+    <title>iHeart — 心臟超聲分析與視覺化</title>
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
   </head>
   <body>
-    <div class="site">
-      <header>
-        <div class="brand"><img src="favicon.svg" alt="" width="30" height="30">iHeart</div>
-        <a href="https://github.com/iheart-3Decho" aria-label="iHeart organization on GitHub">GitHub ↗</a>
-      </header>
-      <main>
-        <section aria-labelledby="site-title">
-          <p class="eyebrow">Three-dimensional echocardiography</p>
-          <h1 id="site-title"><span>i</span>Heart</h1>
-          <p class="subtitle">3D Analysis &amp; Visualization</p>
-          <div class="accent" aria-hidden="true"></div>
-        </section>
-        <div class="space" aria-hidden="true"><div class="orbit"></div><div class="orbit two"></div><div class="orbit three"></div><div class="point"></div></div>
-      </main>
-      <footer><p>© 2026 iHeart</p><p>3D Echocardiography</p></footer>
-    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
