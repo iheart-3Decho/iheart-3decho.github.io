@@ -86,39 +86,27 @@ function scrub(event: Event) {
         @input="scrub"
       />
     </div>
-    <div
-      class="mt-1 flex justify-between text-[8px] tabular-nums text-[#9aacb3]"
-    >
+    <div class="mt-1 flex justify-between text-[8px] tabular-nums text-[#9aacb3]">
       <span>0.00 秒</span><span>{{ item.duration.toFixed(2) }} 秒</span>
     </div>
     <div class="mt-2 grid grid-cols-2 gap-2 max-[650px]:hidden">
       <button
         class="flex items-center gap-1.5 rounded-lg border border-[#e0e9ed] bg-[#f9fbfc] p-2 text-left text-[9px] text-[#657d8a]"
-        :class="
-          selected === 'ed' && !playing
-            ? 'border-[#acd1ca] bg-[#edf7f5] text-[#286f72]'
-            : ''
-        "
+        :class="selected === 'ed' && !playing ? 'border-[#acd1ca] bg-[#edf7f5] text-[#286f72]' : ''"
         @click="emit('phase', 'ed')"
       >
         <i class="h-1.5 w-1.5 rounded-full bg-[#419890]" />充盈最大時刻
         <b class="ml-auto text-[13px]"
-          >{{ (item.phases.ed.frame / item.fps).toFixed(2)
-          }}<small>秒</small></b
+          >{{ (item.phases.ed.frame / item.fps).toFixed(2) }}<small>秒</small></b
         ></button
       ><button
         class="flex items-center gap-1.5 rounded-lg border border-[#e0e9ed] bg-[#f9fbfc] p-2 text-left text-[9px] text-[#657d8a]"
-        :class="
-          selected === 'es' && !playing
-            ? 'border-[#b9c9e3] bg-[#eef3fb] text-[#4573a8]'
-            : ''
-        "
+        :class="selected === 'es' && !playing ? 'border-[#b9c9e3] bg-[#eef3fb] text-[#4573a8]' : ''"
         @click="emit('phase', 'es')"
       >
         <i class="h-1.5 w-1.5 rounded-full bg-[#6b8fc8]" />收縮最小時刻
         <b class="ml-auto text-[13px]"
-          >{{ (item.phases.es.frame / item.fps).toFixed(2)
-          }}<small>秒</small></b
+          >{{ (item.phases.es.frame / item.fps).toFixed(2) }}<small>秒</small></b
         >
       </button>
     </div>

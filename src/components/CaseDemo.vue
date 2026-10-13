@@ -23,9 +23,7 @@ const time = ref(0),
   playing = ref(false),
   overlay = ref(true),
   focus = ref("video");
-const metric = computed(
-  () => props.item.metrics.find((item) => item.id === selectedId.value)!,
-);
+const metric = computed(() => props.item.metrics.find((item) => item.id === selectedId.value)!);
 function select(value: Metric, manual = true) {
   if (manual) emit("manual");
   selectedId.value = value.id;
@@ -57,8 +55,7 @@ function step() {
   if (props.cycleStep % 6 === 0)
     select(
       props.item.metrics[
-        (initialIndex + Math.floor(props.cycleStep / 6)) %
-          props.item.metrics.length
+        (initialIndex + Math.floor(props.cycleStep / 6)) % props.item.metrics.length
       ]!,
       false,
     );
@@ -79,9 +76,7 @@ defineExpose({ pause: () => stage.value?.pause() });
 <template>
   <section
     class="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#dce7eb] bg-white/90 shadow-[0_16px_45px_-20px_#315c6e28]"
-    :aria-label="
-      item.kind === 'function' ? '泵血功能與心室分割示範' : '心臟尺寸與量測示範'
-    "
+    :aria-label="item.kind === 'function' ? '泵血功能與心室分割示範' : '心臟尺寸與量測示範'"
     :data-case="item.id"
   >
     <div
@@ -91,14 +86,8 @@ defineExpose({ pause: () => stage.value?.pause() });
         <span class="text-[10px] tabular-nums text-[#6b97a1]">{{
           item.kind === "function" ? "01" : "02"
         }}</span>
-        <h2
-          class="truncate text-[15px] font-semibold tracking-[.2px] max-[650px]:text-[12px]"
-        >
-          {{
-            item.kind === "function"
-              ? "泵血功能 × 心室分割"
-              : "心臟尺寸 × 量測定位"
-          }}
+        <h2 class="truncate text-[15px] font-semibold tracking-[.2px] max-[650px]:text-[12px]">
+          {{ item.kind === "function" ? "泵血功能 × 心室分割" : "心臟尺寸 × 量測定位" }}
         </h2>
         <span
           class="hidden whitespace-nowrap rounded border border-[#e0e9ec] bg-[#f1f5f7] px-1.5 py-1 text-[8px] text-[#708792] min-[651px]:inline"

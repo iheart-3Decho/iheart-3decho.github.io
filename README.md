@@ -40,9 +40,21 @@ pnpm preview
 來源及坐標／單位規則見 [素材說明](docs/demo-materials.md)。若素材未準備，頁面會提供載入提示。
 
 1. 在論文目錄使用既有 `.scripts/ct-heart-remote/pull`，將所選 LVH 原始影片拉到本網站 `private-source/`；不直接使用 SSH。
-2. 保留项目中已有的 model25 `predictions.csv` 與 Dynamic 影片。
-3. 在本網站執行 `pnpm prepare:demo`，轉換 MP4、生成封面、影片縮圖及六個病例資料。
+1. 保留项目中已有的 model25 `predictions.csv` 與 Dynamic 影片。
+1. 在本網站執行 `pnpm prepare:demo`，轉換 MP4、生成封面、影片縮圖及六個病例資料。
 
 `public/demo/` 是已授權的可公開示範素材；`private-source/` 與包含病例素材的 `dist/` 仍保留在本地並排除 Git 提交。預覽截圖存於 `private-source/previews/`。
 
-目前的 [GitHub Pages 標題頁](https://iheart-3decho.github.io/) 保留。本次沒有推送、部署或修改 Pages 配置；目前六個病例已獲使用者確認可公開展示，完整靜態版可在確認發布時配置獨立部署流程。不要直接推送此 Vue 源碼到當前按倉庫根目錄發布的 Pages。
+## GitHub Pages 發布
+
+公開演示網址：[iHeart](https://iheart-3decho.github.io/)。六個病例已獲使用者確認可公開展示。
+
+`.github/workflows/pages.yml` 在 `main` 推送後驗證病例資料、檢查 TypeScript 並構建 Vue 網站，再將 `dist/` 作為 GitHub Pages artifact 發布。也可透過 GitHub Actions 的手動執行入口重新發布。Pages 的發布來源使用 **GitHub Actions**，不直接發布倉庫根目錄。
+
+發布內容包括前端與 `public/demo/` 中的 MP4、縮圖及預置結果。`private-source/`、原始研究 AVI 和本地驗收截圖不進入發布 artifact。
+
+部署後可驗證公開網站：
+
+```bash
+DEMO_URL=https://iheart-3decho.github.io/ pnpm check:browser
+```

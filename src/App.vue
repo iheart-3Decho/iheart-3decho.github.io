@@ -9,17 +9,12 @@ const failed = ref(false),
   loaded = ref(false);
 const route = ref(window.location.hash || "#/");
 const caseId = computed(() =>
-  route.value.startsWith("#/case/")
-    ? decodeURIComponent(route.value.slice(7).split("?")[0]!)
-    : "",
+  route.value.startsWith("#/case/") ? decodeURIComponent(route.value.slice(7).split("?")[0]!) : "",
 );
 const initialMetric = computed(
-  () =>
-    new URLSearchParams(route.value.split("?")[1] ?? "").get("metric") ?? "",
+  () => new URLSearchParams(route.value.split("?")[1] ?? "").get("metric") ?? "",
 );
-const activeCase = computed(() =>
-  cases.value.find((item) => item.id === caseId.value),
-);
+const activeCase = computed(() => cases.value.find((item) => item.id === caseId.value));
 function syncRoute() {
   route.value = window.location.hash || "#/";
 }
@@ -69,17 +64,9 @@ onBeforeUnmount(() => window.removeEventListener("hashchange", syncRoute));
     role="status"
   >
     <h1 class="text-[24px]">
-      {{
-        failed
-          ? "病例素材未能載入"
-          : loaded
-            ? "找不到這個示範病例"
-            : "正在載入示範病例…"
-      }}
+      {{ failed ? "病例素材未能載入" : loaded ? "找不到這個示範病例" : "正在載入示範病例…" }}
     </h1>
-    <a
-      href="#/"
-      class="rounded-lg bg-[#246c79] px-4 py-2 text-[13px] text-white hover:bg-[#318292]"
+    <a href="#/" class="rounded-lg bg-[#246c79] px-4 py-2 text-[13px] text-white hover:bg-[#318292]"
       >返回病例首頁</a
     >
   </main>

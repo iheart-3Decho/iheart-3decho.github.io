@@ -2,8 +2,8 @@
 
 @theme {
   --font-sans:
-    Inter, "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang TC",
-    "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    Inter, "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC",
+    "Microsoft JhengHei", sans-serif;
   --color-ink: #193240;
   --color-canvas: #f4f7fa;
   --color-brand: #147e7d;

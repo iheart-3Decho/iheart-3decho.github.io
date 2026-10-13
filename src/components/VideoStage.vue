@@ -23,10 +23,7 @@ let animation = 0,
   pendingPlay = false;
 const asset = (file: string) => `${import.meta.env.BASE_URL}demo/${file}`;
 const frame = computed(() =>
-  Math.min(
-    props.item.frameCount - 1,
-    Math.round(currentTime.value * props.item.fps),
-  ),
+  Math.min(props.item.frameCount - 1, Math.round(currentTime.value * props.item.fps)),
 );
 const geometry = computed(() => props.metric.evidence.geometry);
 const showGeometry = computed(
@@ -40,8 +37,7 @@ const points = computed(() =>
   geometry.value?.points.map((point) => `${point[0]},${point[1]}`).join(" "),
 );
 const timeLabel = computed(
-  () =>
-    `${currentTime.value.toFixed(2)} / ${props.item.duration.toFixed(2)} 秒`,
+  () => `${currentTime.value.toFixed(2)} / ${props.item.duration.toFixed(2)} 秒`,
 );
 function update() {
   if (video.value) {
@@ -153,9 +149,7 @@ defineExpose({ seek, play, pause });
       class="pointer-events-none absolute left-3 right-3 top-3 z-[2] flex items-center justify-between text-[9px] tracking-[.5px] text-[#c6d4da]"
     >
       <span class="flex items-center gap-1.5"
-        ><i class="h-1.5 w-1.5 rounded-full bg-[#53e1c3] animate-signal" />{{
-          item.view
-        }}</span
+        ><i class="h-1.5 w-1.5 rounded-full bg-[#53e1c3] animate-signal" />{{ item.view }}</span
       ><span
         class="rounded border border-[#3e555e] bg-[#10232d90] px-1.5 py-1 text-[8px] text-[#a0c8c6]"
         >{{ overlay ? "AI 量測視圖" : "原始影像" }}</span
@@ -205,9 +199,7 @@ defineExpose({ seek, play, pause });
           vector-effect="non-scaling-stroke"
         />
         <circle
-          v-for="(point, index) in geometry.kind === 'line'
-            ? geometry.points
-            : []"
+          v-for="(point, index) in geometry.kind === 'line' ? geometry.points : []"
           :key="index"
           :cx="point[0]"
           :cy="point[1]"
@@ -265,8 +257,7 @@ defineExpose({ seek, play, pause });
       @click="setSpeed"
     >
       {{ slow ? "0.5× 慢速" : "1× 正常" }}</button
-    ><span
-      class="ml-auto hidden items-center gap-1 text-[9px] text-[#8a9ca5] min-[1101px]:flex"
+    ><span class="ml-auto hidden items-center gap-1 text-[9px] text-[#8a9ca5] min-[1101px]:flex"
       ><Icon name="scan" :size="13" />點選時刻，立即定位</span
     >
   </div>

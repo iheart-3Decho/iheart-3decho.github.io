@@ -12,8 +12,7 @@ const highlight = computed(
 const geometry = computed(
   () =>
     props.item.phases.ed.geometry ??
-    props.item.metrics.find((metric) => metric.id === "lvidd")?.evidence
-      .geometry ??
+    props.item.metrics.find((metric) => metric.id === "lvidd")?.evidence.geometry ??
     props.item.metrics[0]?.evidence.geometry,
 );
 </script>
@@ -23,9 +22,7 @@ const geometry = computed(
     aria-label="從影片到量測的可視化流程"
   >
     <div>
-      <span class="text-[9px] tracking-[1px] text-[#718691]"
-        >一個模型，串起整段流程</span
-      >
+      <span class="text-[9px] tracking-[1px] text-[#718691]">一個模型，串起整段流程</span>
       <h2 class="mt-1 text-[19px] leading-tight">從影片到指標</h2>
       <p class="mt-1 text-[9px] text-[#8799a4]">每個數值，都連到影像。</p>
     </div>
@@ -46,31 +43,21 @@ const geometry = computed(
         class="h-[58px] w-[78px] flex-none overflow-hidden rounded-lg border border-[#d8e6e8] bg-[#14222c] p-1"
       >
         <template v-if="index === 0"
-          ><div
-            class="flex h-full w-max gap-1 animate-film motion-reduce:animate-none"
-          >
+          ><div class="flex h-full w-max gap-1 animate-film motion-reduce:animate-none">
             <img
-              v-for="(frame, i) in [
-                ...item.framePreviews,
-                ...item.framePreviews,
-              ]"
+              v-for="(frame, i) in [...item.framePreviews, ...item.framePreviews]"
               :key="i"
               class="h-full w-[70px] object-contain"
               :src="`${base}demo/${frame.image}`"
               alt="心超影片影格"
             /></div></template
-        ><svg
-          v-else-if="index === 1"
-          class="h-full w-full"
-          viewBox="0 0 100 60"
-        >
+        ><svg v-else-if="index === 1" class="h-full w-full" viewBox="0 0 100 60">
           <polyline
             v-if="item.volumeSeries"
             :points="
               item.volumeSeries
                 .map(
-                  (p) =>
-                    `${(p.frame / (item.frameCount - 1)) * 100},${55 - (p.value / 200) * 40}`,
+                  (p) => `${(p.frame / (item.frameCount - 1)) * 100},${55 - (p.value / 200) * 40}`,
                 )
                 .join(' ')
             "
@@ -102,25 +89,17 @@ const geometry = computed(
         <div v-else class="grid h-full place-items-center rounded bg-[#e7f3f0]">
           <strong class="text-[16px] text-[#278f87]"
             >{{ highlight.value.toFixed(1)
-            }}<small class="text-[8px]">{{
-              item.kind === "function" ? "%" : " mm"
-            }}</small></strong
+            }}<small class="text-[8px]">{{ item.kind === "function" ? "%" : " mm" }}</small></strong
           >
         </div>
       </div>
       <div class="min-w-0">
-        <small class="text-[8px] text-[#7899a0]"
-          >0{{ index + 1 }} · {{ step.sub }}</small
-        >
+        <small class="text-[8px] text-[#7899a0]">0{{ index + 1 }} · {{ step.sub }}</small>
         <h3 class="mt-0.5 truncate text-[11px] font-semibold text-[#315963]">
           {{ step.title }}
         </h3>
       </div>
-      <span
-        v-if="index < 3"
-        class="absolute -right-2 text-[18px] text-[#aec6cc]"
-        >→</span
-      >
+      <span v-if="index < 3" class="absolute -right-2 text-[18px] text-[#aec6cc]">→</span>
     </div>
   </section>
 </template>

@@ -31,9 +31,7 @@ const entries = computed(() =>
   >
     <div class="flex items-center">
       <div>
-        <span class="text-[9px] tracking-[1px] text-[#718691]"
-          >找到時刻，也看見位置</span
-        >
+        <span class="text-[9px] tracking-[1px] text-[#718691]">找到時刻，也看見位置</span>
         <h2 class="mt-1 text-[17px] leading-tight">充盈與收縮，一眼對照</h2>
       </div>
     </div>
@@ -51,18 +49,13 @@ const entries = computed(() =>
         :aria-label="entry.title"
         @click="emit('phase', entry.phase)"
       >
-        <div
-          class="col-span-full flex items-center justify-between text-[9px] text-[#4e7c85]"
-        >
+        <div class="col-span-full flex items-center justify-between text-[9px] text-[#4e7c85]">
           <span class="flex items-center gap-1.5"
             ><i
               class="h-1.5 w-1.5 rounded-full"
               :class="entry.phase === 'ed' ? 'bg-[#419890]' : 'bg-[#6b8fc8]'"
             />{{ entry.title }}</span
-          ><b
-            >{{ (entry.metric.evidence.frame / item.fps).toFixed(2)
-            }}<small>秒</small></b
-          >
+          ><b>{{ (entry.metric.evidence.frame / item.fps).toFixed(2) }}<small>秒</small></b>
         </div>
         <FrameThumb
           :item="item"
@@ -77,9 +70,7 @@ const entries = computed(() =>
             }}</small></span
           ><strong class="text-[21px] font-medium text-[#297f85]"
             >{{ entry.metric.value.toFixed(1)
-            }}<small class="ml-1 text-[9px]">{{
-              entry.metric.unit
-            }}</small></strong
+            }}<small class="ml-1 text-[9px]">{{ entry.metric.unit }}</small></strong
           >
         </div>
       </button>

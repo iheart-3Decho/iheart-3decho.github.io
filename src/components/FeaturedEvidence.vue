@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import Icon from "./Icon.vue";
-import {
-  assetUrl,
-  formatMetric,
-  metricMeaning,
-  metricRoute,
-} from "../utils/demo";
+import { assetUrl, formatMetric, metricMeaning, metricRoute } from "../utils/demo";
 import type { MetricDemo } from "../utils/demo";
 
 const props = defineProps<{ demo: MetricDemo; automatic: boolean }>();
@@ -15,9 +10,7 @@ const located = ref(false),
   currentTime = ref(0),
   failed = ref(false);
 const points = computed(() =>
-  props.demo.metric.evidence.geometry?.points
-    .map((point) => point.join(","))
-    .join(" "),
+  props.demo.metric.evidence.geometry?.points.map((point) => point.join(",")).join(" "),
 );
 const progress = computed(() =>
   Math.min(100, (currentTime.value / props.demo.item.duration) * 100),
@@ -30,18 +23,14 @@ function locate() {
   if (!video.value) return;
   video.value.pause();
   located.value = false;
-  video.value.currentTime =
-    props.demo.metric.evidence.frame / props.demo.item.fps;
+  video.value.currentTime = props.demo.metric.evidence.frame / props.demo.item.fps;
 }
 function update() {
   if (!video.value) return;
   currentTime.value = video.value.currentTime;
   located.value =
     video.value.paused &&
-    Math.abs(
-      currentTime.value * props.demo.item.fps -
-        props.demo.metric.evidence.frame,
-    ) <= 1;
+    Math.abs(currentTime.value * props.demo.item.fps - props.demo.metric.evidence.frame) <= 1;
 }
 async function replay() {
   if (!video.value) return;
@@ -141,9 +130,7 @@ onBeforeUnmount(() => {
           ><i class="size-1.5 rounded-full bg-[#53e1c3] animate-signal" />{{
             located ? "已找到量測畫面" : "從整段影片尋找關鍵時刻"
           }}</span
-        ><span class="rounded-full bg-[#081a22b3] px-3 py-1.5">{{
-          demo.item.view
-        }}</span>
+        ><span class="rounded-full bg-[#081a22b3] px-3 py-1.5">{{ demo.item.view }}</span>
       </div>
       <div
         class="absolute right-5 top-[24%] flex w-[190px] flex-col gap-1.5 rounded-2xl border border-[#dce7eb] bg-white/95 p-4 shadow-[0_12px_30px_#0002] backdrop-blur-xl"
@@ -154,9 +141,7 @@ onBeforeUnmount(() => {
         <strong class="text-[32px] font-medium tracking-tight text-brand">{{
           formatMetric(demo.metric)
         }}</strong>
-        <p class="text-[11px] leading-[1.7] text-[#5a7480]">
-          （{{ metricMeaning(demo.metric) }}）
-        </p>
+        <p class="text-[11px] leading-[1.7] text-[#5a7480]">（{{ metricMeaning(demo.metric) }}）</p>
         <a
           class="mt-2 flex items-center gap-1.5 border-t border-line pt-2 text-[10px] text-brand hover:text-[#195b63]"
           :href="metricRoute(demo.item, demo.metric)"
@@ -166,11 +151,7 @@ onBeforeUnmount(() => {
       <div
         class="absolute bottom-5 left-5 flex items-center gap-3 rounded-xl border border-[#dce7eb] bg-white/95 px-4 py-3 shadow-sm backdrop-blur"
       >
-        <Icon
-          :name="located ? 'scan' : 'video'"
-          :size="25"
-          class="text-brand"
-        />
+        <Icon :name="located ? 'scan' : 'video'" :size="25" class="text-brand" />
         <div>
           <span class="block text-[10px] text-[#627d88]">{{
             located ? "WHEN · 量測時刻" : "完整影片 · 自動演示"
@@ -184,9 +165,7 @@ onBeforeUnmount(() => {
             <small class="text-[11px]">秒</small></strong
           ><span v-if="located" class="ml-3 text-[11px] text-brand"
             >{{ demo.metric.phase === "ed" ? "心室充盈" : "心室收縮"
-            }}{{
-              demo.metric.id === "ef" ? " · 結合收縮畫面計算泵血比例" : ""
-            }}</span
+            }}{{ demo.metric.id === "ef" ? " · 結合收縮畫面計算泵血比例" : "" }}</span
           >
         </div>
       </div>

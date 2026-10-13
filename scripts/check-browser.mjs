@@ -27,16 +27,13 @@ async function fit() {
       document.documentElement.scrollHeight > innerHeight
     )
       return "page overflow";
-    for (const card of document.querySelectorAll(
-      "[data-home-metric], [data-keyframe-card]",
-    )) {
+    for (const card of document.querySelectorAll("[data-home-metric], [data-keyframe-card]")) {
       if (card.scrollHeight > card.clientHeight + 1) return "card overflow";
     }
     const canvas = document.querySelector("[data-home-canvas]");
     if (canvas) {
       const bounds = canvas.getBoundingClientRect();
-      if (bounds.left > 25 || innerWidth - bounds.right > 25)
-        return "excessive home side margins";
+      if (bounds.left > 25 || innerWidth - bounds.right > 25) return "excessive home side margins";
       const intro = document.querySelector("[data-home-intro]");
       if (
         intro &&
@@ -64,16 +61,10 @@ async function waitFrame(caseId, metricId) {
     },
     { caseId, fps: item.fps, frame: metric.evidence.frame },
   );
-  await page
-    .locator('svg[aria-label="模型預測量測位置"]')
-    .waitFor({ state: "visible" });
-  await page
-    .locator('svg[aria-label="模型預測量測位置"]')
-    .evaluate(async (svg) => {
-      await Promise.all(
-        svg.getAnimations().map((animation) => animation.finished),
-      );
-    });
+  await page.locator('svg[aria-label="模型預測量測位置"]').waitFor({ state: "visible" });
+  await page.locator('svg[aria-label="模型預測量測位置"]').evaluate(async (svg) => {
+    await Promise.all(svg.getAnimations().map((animation) => animation.finished));
+  });
   const selected = await page
     .locator(`[data-case="${caseId}"] button[aria-pressed="true"]`)
     .allTextContents();
@@ -98,19 +89,13 @@ try {
   await page.locator('[data-featured-metric="edv"]').waitFor();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();
   assert.ok(
-    Math.abs(
-      (await page.locator("video").evaluate((video) => video.currentTime)) -
-        2.06,
-    ) < 0.02,
+    Math.abs((await page.locator("video").evaluate((video) => video.currentTime)) - 2.06) < 0.02,
   );
   await page.getByRole("button", { name: "停止首頁自動演示" }).click();
   await page.getByRole("button", { name: "展示LVIDs", exact: true }).click();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();
   assert.ok(
-    Math.abs(
-      (await page.locator("video").evaluate((video) => video.currentTime)) -
-        1.84,
-    ) < 0.02,
+    Math.abs((await page.locator("video").evaluate((video) => video.currentTime)) - 1.84) < 0.02,
   );
   await page.screenshot({ path: resolve(output, "home-lvids-1920.png") });
   for (const [caseId, metricId] of choices) {
@@ -129,9 +114,7 @@ try {
   await page.keyboard.press("Enter");
   await waitFrame("dimension-02", "lvidd");
   await page.getByRole("button", { name: "原始影像", exact: true }).click();
-  await page
-    .locator('svg[aria-label="模型預測量測位置"]')
-    .waitFor({ state: "hidden" });
+  await page.locator('svg[aria-label="模型預測量測位置"]').waitFor({ state: "hidden" });
   await page.getByRole("button", { name: "AI 量測", exact: true }).click();
   await waitFrame("dimension-02", "lvidd");
   await page.getByRole("button", { name: "播放影片", exact: true }).click();
@@ -145,10 +128,7 @@ try {
   await page.reload();
   await page.getByRole("button", { name: "開始首頁自動演示" }).waitFor();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();
-  assert.equal(
-    await page.locator("video").evaluate((video) => video.paused),
-    true,
-  );
+  assert.equal(await page.locator("video").evaluate((video) => video.paused), true);
   await page.setViewportSize({ width: 2560, height: 1187 });
   await fit();
   await page.screenshot({ path: resolve(output, "home-wide-2560.png") });

@@ -5,9 +5,7 @@ import type { DemoCase, Metric } from "../types";
 import { metricMeaning } from "../utils/demo";
 const props = defineProps<{ item: DemoCase; selected: string }>();
 const values = computed(() =>
-  Object.fromEntries(
-    props.item.metrics.map((metric) => [metric.id, metric.value]),
-  ),
+  Object.fromEntries(props.item.metrics.map((metric) => [metric.id, metric.value])),
 );
 defineEmits<{ select: [metric: Metric] }>();
 const format = (metric: Metric) => metric.value.toFixed(1);
@@ -19,24 +17,17 @@ const format = (metric: Metric) => metric.value.toFixed(1);
   >
     <div class="flex flex-none items-center justify-between">
       <div>
-        <span class="text-[9px] tracking-[1px] text-[#718691]"
-          >讓影片成為清晰的答案</span
-        >
+        <span class="text-[9px] tracking-[1px] text-[#718691]">讓影片成為清晰的答案</span>
         <h2 class="mt-1.5 text-[20px] font-semibold max-[650px]:text-[18px]">
           {{ item.kind === "function" ? "心臟的泵血能力" : "心臟的尺寸與厚度" }}
         </h2>
       </div>
-      <span
-        class="grid h-9 w-9 place-items-center rounded-[10px] bg-[#f0f7f5] text-[#408b88]"
+      <span class="grid h-9 w-9 place-items-center rounded-[10px] bg-[#f0f7f5] text-[#408b88]"
         ><Icon :name="item.kind === 'function' ? 'heart' : 'ruler'" :size="22"
       /></span>
     </div>
     <p class="my-2 text-[10px] text-[#8b9aa5]">
-      {{
-        item.kind === "function"
-          ? "一次心跳，泵出多少血液？"
-          : "心室有多寬？心壁有多厚？"
-      }}
+      {{ item.kind === "function" ? "一次心跳，泵出多少血液？" : "心室有多寬？心壁有多厚？" }}
     </p>
     <div class="grid min-h-0 flex-1 grid-cols-2 grid-rows-[1.2fr_1fr] gap-2">
       <button
@@ -52,31 +43,26 @@ const format = (metric: Metric) => metric.value.toFixed(1);
         :aria-pressed="metric.id === selected"
         @click="$emit('select', metric)"
       >
-        <span
-          class="flex items-start justify-between gap-1 text-[11px] font-medium"
+        <span class="flex items-start justify-between gap-1 text-[11px] font-medium"
           ><span
             >{{ metric.label
-            }}<small
-              class="mt-0.5 block text-[8px] tracking-[.6px] text-[#92a6ad]"
-              >{{ metric.code }}</small
-            ></span
+            }}<small class="mt-0.5 block text-[8px] tracking-[.6px] text-[#92a6ad]">{{
+              metric.code
+            }}</small></span
           ><Icon :name="metric.id === selected ? 'scan' : 'chevron'" :size="15"
         /></span>
         <span
           class="my-2 text-[32px] font-medium leading-none tracking-[-1.3px] text-[#2d6071] tabular-nums max-[650px]:text-[29px]"
           :class="metric.id === 'ef' ? 'text-[52px] text-[#187e77]' : ''"
           >{{ format(metric)
-          }}<small
-            class="ml-1 text-[11px] font-normal tracking-normal text-[#79949e]"
-            >{{ metric.unit }}</small
-          ></span
+          }}<small class="ml-1 text-[11px] font-normal tracking-normal text-[#79949e]">{{
+            metric.unit
+          }}</small></span
         >
         <span class="text-[10px] leading-[1.5] text-[#758c95]"
           >（{{ metricMeaning(metric) }}）</span
         >
-        <span
-          v-if="metric.id === 'ef'"
-          class="mt-2 block h-1 overflow-hidden rounded bg-[#dceee8]"
+        <span v-if="metric.id === 'ef'" class="mt-2 block h-1 overflow-hidden rounded bg-[#dceee8]"
           ><i
             class="block h-full rounded bg-[linear-gradient(to_right,_#328595,_#3ea995)]"
             :style="{ width: `${Math.min(100, Math.max(0, metric.value))}%` }"
@@ -93,22 +79,15 @@ const format = (metric: Metric) => metric.value.toFixed(1);
           >{{ (values.edv - values.esv).toFixed(1) }} <small>mL</small></strong
         >
       </div>
-      <div
-        class="mt-1.5 flex h-4 overflow-hidden rounded bg-[#deeaeb] text-[7px] text-[#6d8c95]"
-      >
+      <div class="mt-1.5 flex h-4 overflow-hidden rounded bg-[#deeaeb] text-[7px] text-[#6d8c95]">
         <span
           class="flex items-center justify-center bg-[#49a69a] text-white"
           :style="{ width: `${values.ef}%` }"
           >泵出的血量</span
-        ><span class="flex flex-1 items-center justify-center"
-          >留在心室的血量</span
-        >
+        ><span class="flex flex-1 items-center justify-center">留在心室的血量</span>
       </div>
     </div>
-    <div
-      v-else
-      class="mt-2 rounded-lg border border-[#deeaed] bg-[#f4f8f9] p-2.5"
-    >
+    <div v-else class="mt-2 rounded-lg border border-[#deeaed] bg-[#f4f8f9] p-2.5">
       <div class="flex items-center justify-between text-[9px] text-[#557b85]">
         <span>心室內徑，隨收縮變化</span><Icon name="ruler" :size="15" />
       </div>

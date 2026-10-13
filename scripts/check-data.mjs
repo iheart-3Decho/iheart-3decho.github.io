@@ -44,9 +44,7 @@ for (const c of cases) {
 }
 assert.equal(new Set(cases.map((item) => item.id)).size, 6);
 for (const item of cases.filter((entry) => entry.kind === "function")) {
-  const values = Object.fromEntries(
-    item.metrics.map((metric) => [metric.id, metric.value]),
-  );
+  const values = Object.fromEntries(item.metrics.map((metric) => [metric.id, metric.value]));
   assert.ok(
     Math.abs(values.ef - (1 - values.esv / values.edv) * 100) < 0.001,
     `${item.id}: EF consistency`,

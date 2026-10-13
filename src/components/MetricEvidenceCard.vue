@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import FrameThumb from "./FrameThumb.vue";
 import Icon from "./Icon.vue";
-import {
-  assetUrl,
-  formatMetric,
-  metricMeaning,
-  metricRoute,
-} from "../utils/demo";
+import { assetUrl, formatMetric, metricMeaning, metricRoute } from "../utils/demo";
 import type { MetricDemo } from "../utils/demo";
 defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
 </script>
@@ -18,9 +13,7 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
     :data-home-metric="demo.metric.id"
     :aria-label="`${demo.metric.code}：${demo.question}，查看影片中的量測畫面`"
     class="group flex min-h-0 flex-col overflow-hidden rounded-2xl border bg-white/95 shadow-[0_8px_25px_-14px_#315c6e25] transition duration-300 hover:-translate-y-1 hover:border-[#92c6bd] hover:bg-[#f2faf7] focus-visible:outline-offset-[-4px]"
-    :class="
-      active ? 'border-[#68afa3] ring-1 ring-[#68afa330]' : 'border-[#dce7ea]'
-    "
+    :class="active ? 'border-[#68afa3] ring-1 ring-[#68afa330]' : 'border-[#dce7ea]'"
   >
     <div class="relative min-h-0 flex-1 overflow-hidden bg-[#061017]">
       <FrameThumb
@@ -32,9 +25,7 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
       <div
         class="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,_#071820e6,_transparent_46%)]"
       />
-      <div
-        class="absolute left-3 right-3 top-2.5 flex items-center justify-between"
-      >
+      <div class="absolute left-3 right-3 top-2.5 flex items-center justify-between">
         <span
           class="rounded-md border border-white/15 bg-[#071820b3] px-2 py-1 text-[12px] font-semibold tracking-wider text-[#97ead9] backdrop-blur"
           >{{ demo.metric.code }}</span
@@ -47,9 +38,7 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
       <div
         class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] text-[#cfefeb]"
       >
-        <span class="flex items-center gap-1.5"
-          ><Icon name="scan" :size="13" />已定位量測畫面</span
-        >
+        <span class="flex items-center gap-1.5"><Icon name="scan" :size="13" />已定位量測畫面</span>
         <b class="font-medium tabular-nums"
           >{{ (demo.metric.evidence.frame / demo.item.fps).toFixed(2) }} 秒</b
         >
@@ -61,10 +50,9 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
         {{ demo.question }}
       </h3>
       <div class="flex items-baseline justify-between gap-1">
-        <strong
-          class="text-[23px] font-medium tracking-tight text-brand tabular-nums"
-          >{{ formatMetric(demo.metric) }}</strong
-        >
+        <strong class="text-[23px] font-medium tracking-tight text-brand tabular-nums">{{
+          formatMetric(demo.metric)
+        }}</strong>
         <small class="text-[8px] text-[#627d88]"
           >示範病例 {{ String(index + 1).padStart(2, "0") }}</small
         >
@@ -77,14 +65,9 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
         class="relative h-[28px] overflow-hidden rounded-md border border-[#d4e5e7] bg-[#0c141d]"
         aria-hidden="true"
       >
-        <div
-          class="flex h-full w-max gap-0.5 animate-film motion-reduce:animate-none"
-        >
+        <div class="flex h-full w-max gap-0.5 animate-film motion-reduce:animate-none">
           <img
-            v-for="(frame, i) in [
-              ...demo.item.framePreviews,
-              ...demo.item.framePreviews,
-            ]"
+            v-for="(frame, i) in [...demo.item.framePreviews, ...demo.item.framePreviews]"
             :key="i"
             class="h-full w-[36px] object-cover opacity-75"
             :src="assetUrl(frame.image)"

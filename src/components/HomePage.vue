@@ -10,18 +10,13 @@ import type { DemoCase } from "../types";
 const props = defineProps<{ cases: DemoCase[]; failed: boolean }>();
 const demos = computed(() => metricDemos(props.cases));
 const featuredIndex = ref(0);
-const automatic = ref(
-  !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-);
-const featured = computed(
-  () => demos.value[featuredIndex.value % Math.max(demos.value.length, 1)],
-);
+const automatic = ref(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const featured = computed(() => demos.value[featuredIndex.value % Math.max(demos.value.length, 1)]);
 let timer: ReturnType<typeof setInterval> | undefined;
 onMounted(() => {
   timer = setInterval(() => {
     if (automatic.value)
-      featuredIndex.value =
-        (featuredIndex.value + 1) % Math.max(demos.value.length, 1);
+      featuredIndex.value = (featuredIndex.value + 1) % Math.max(demos.value.length, 1);
   }, 9000);
 });
 onBeforeUnmount(() => {
@@ -30,13 +25,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    class="relative isolate h-dvh w-full overflow-hidden px-6 pt-4 pb-2 text-ink"
-  >
-    <div
-      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      aria-hidden="true"
-    >
+  <div class="relative isolate h-dvh w-full overflow-hidden px-6 pt-4 pb-2 text-ink">
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
       <span
         class="absolute -top-[38vw] -right-[20vw] size-[75vw] rounded-full border border-[#278e8514] animate-orbit"
       />
@@ -54,10 +44,8 @@ onBeforeUnmount(() => {
         ><span
           class="grid size-[37px] place-items-center rounded-xl bg-[linear-gradient(145deg,_#278aa4,_#136962)] text-white shadow-sm"
           ><Icon name="heart" :size="21" /></span
-        ><strong class="text-[26px] font-semibold tracking-[-1.2px]"
-          >iHeart</strong
-        ><span
-          class="ml-2 border-l border-[#cddade] pl-4 text-[10px] tracking-wide text-muted"
+        ><strong class="text-[26px] font-semibold tracking-[-1.2px]">iHeart</strong
+        ><span class="ml-2 border-l border-[#cddade] pl-4 text-[10px] tracking-wide text-muted"
           >3D Analysis &amp; Visualization</span
         ></a
       >
@@ -86,9 +74,7 @@ onBeforeUnmount(() => {
         aria-label="iHeart 心臟超聲互動示範"
       >
         <div class="flex min-h-0 flex-col justify-center" data-home-intro>
-          <p
-            class="mb-3 flex items-center gap-2.5 text-[11px] tracking-widest text-[#527c84]"
-          >
+          <p class="mb-3 flex items-center gap-2.5 text-[11px] tracking-widest text-[#527c84]">
             <i
               class="size-2 rounded-full bg-brand animate-signal"
             />不只讀出數字，也找到它來自哪幅畫面
@@ -96,9 +82,7 @@ onBeforeUnmount(() => {
           <h1
             class="text-[clamp(56px,3.15vw,84px)] font-medium leading-[1.13] tracking-[-2.5px] text-ink animate-enter"
           >
-            從一段超聲影片<br />找到心臟的<span class="text-brand"
-              >關鍵時刻</span
-            >
+            從一段超聲影片<br />找到心臟的<span class="text-brand">關鍵時刻</span>
           </h1>
           <p class="mt-3 text-[15px] leading-[1.85] text-[#5a7480]">
             心臟把血液送到全身，超聲讓我們看見它如何跳動。iHeart
@@ -110,13 +94,9 @@ onBeforeUnmount(() => {
               class="flex items-center gap-3 rounded-[9px] bg-[linear-gradient(110deg,_#217f90,_#197e71)] px-5 py-3.5 text-[13px] font-medium text-white shadow-[0_8px_24px_#1b9f8b20] transition hover:-translate-y-0.5"
               :href="metricRoute(featured.item, featured.metric)"
               >進入互動演示<Icon name="arrow" :size="17" /></a
-            ><span class="text-[11px] text-[#627d88]"
-              >點選下方任一指標，直接查看對應畫面</span
-            >
+            ><span class="text-[11px] text-[#627d88]">點選下方任一指標，直接查看對應畫面</span>
           </div>
-          <div
-            class="mt-4 grid grid-cols-3 gap-3 border-t border-[#d4e5e7] pt-3"
-          >
+          <div class="mt-4 grid grid-cols-3 gap-3 border-t border-[#d4e5e7] pt-3">
             <div
               v-for="step in [
                 { icon: 'video', title: '一段影片', sub: '保留完整動態過程' },
@@ -135,12 +115,8 @@ onBeforeUnmount(() => {
                 ><Icon :name="step.icon" :size="18"
               /></span>
               <div>
-                <b class="block text-[12px] font-medium text-[#315963]">{{
-                  step.title
-                }}</b
-                ><small class="text-[10px] text-[#627d88]">{{
-                  step.sub
-                }}</small>
+                <b class="block text-[12px] font-medium text-[#315963]">{{ step.title }}</b
+                ><small class="text-[10px] text-[#627d88]">{{ step.sub }}</small>
               </div>
             </div>
           </div>
@@ -174,9 +150,7 @@ onBeforeUnmount(() => {
               >VIDEO → KEY FRAME → MEASUREMENT</span
             >
             <h2 class="mt-1 text-[23px] font-medium tracking-tight text-ink">
-              選一項量測，<span class="text-brand"
-                >看它在影片中的時刻與位置</span
-              >
+              選一項量測，<span class="text-brand">看它在影片中的時刻與位置</span>
             </h2>
           </div>
           <div class="flex items-center gap-2" aria-label="切換首頁量測演示">
@@ -206,16 +180,11 @@ onBeforeUnmount(() => {
             :active="index === featuredIndex"
           />
         </div>
-        <div
-          v-else
-          class="flex flex-1 items-center justify-center text-[12px] text-muted"
-        >
+        <div v-else class="flex flex-1 items-center justify-center text-[12px] text-muted">
           {{ failed ? "無法載入量測示範，請重新整理。" : "正在準備量測示範…" }}
         </div>
       </section>
-      <footer
-        class="flex items-center justify-between border-t border-line text-[9px] text-muted"
-      >
+      <footer class="flex items-center justify-between border-t border-line text-[9px] text-muted">
         <span>iHeart · 3D Analysis &amp; Visualization</span
         ><span>同一模型，連起影片、關鍵畫面、心室輪廓與量測結果。</span
         ><span>示範病例 · 七項指標 · 點選卡片查看完整結果</span>

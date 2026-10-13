@@ -1,10 +1,4 @@
-import {
-  readFileSync,
-  writeFileSync,
-  mkdirSync,
-  copyFileSync,
-  existsSync,
-} from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -14,10 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const project = resolve(root, "..");
 const destination = resolve(root, "public/demo");
 mkdirSync(destination, { recursive: true });
-const csvPath = resolve(
-  project,
-  "CT-Heart/.docs/remote-pull/model25-vis/predictions.csv",
-);
+const csvPath = resolve(project, "CT-Heart/.docs/remote-pull/model25-vis/predictions.csv");
 const rows = parse(readFileSync(csvPath, "utf8"), {
   columns: true,
   skip_empty_lines: true,
@@ -30,10 +21,7 @@ const specs = [
     sourceId: "0X100CF05D141FF143",
     dataset: "EchoNet-Dynamic",
     view: "心尖四腔心切面",
-    file: resolve(
-      project,
-      "STG/PPTX/2026-10-04/assets/clinical/0X100CF05D141FF143.avi",
-    ),
+    file: resolve(project, "STG/PPTX/2026-10-04/assets/clinical/0X100CF05D141FF143.avi"),
   },
   {
     id: "function-27",
@@ -82,12 +70,9 @@ const specs = [
   },
 ];
 const records = specs.map((spec) => {
-  const row = rows.find(
-    (r) => r.patient_id === spec.sourceId && r.source === spec.source,
-  );
+  const row = rows.find((r) => r.patient_id === spec.sourceId && r.source === spec.source);
   if (!row) throw new Error(`Missing model25 prediction: ${spec.sourceId}`);
-  if (!existsSync(spec.file))
-    throw new Error(`Missing source video: ${spec.file}`);
+  if (!existsSync(spec.file)) throw new Error(`Missing source video: ${spec.file}`);
   return { ...spec, row, video: `${spec.id}.mp4`, poster: `${spec.id}-ed.jpg` };
 });
 function probe(file) {
@@ -124,10 +109,7 @@ function transform(point, width, height) {
     h = Math.round(height * scale);
   const left = Math.floor((512 - w) / 2),
     top = Math.floor((384 - h) / 2);
-  return [
-    ((point[0] * 512 - left) / w) * width,
-    ((point[1] * 384 - top) / h) * height,
-  ];
+  return [((point[0] * 512 - left) / w) * width, ((point[1] * 384 - top) / h) * height];
 }
 function evidence(row, prefix, metadata, kind) {
   const points =
@@ -207,9 +189,7 @@ const cases = records.map((record) => {
         },
       ],
       volumeSeries: volume.map((value, i) => ({
-        frame: Math.round(
-          (i * (metadata.frameCount - 1)) / (volume.length - 1),
-        ),
+        frame: Math.round((i * (metadata.frameCount - 1)) / (volume.length - 1)),
         value,
       })),
     });
@@ -302,10 +282,7 @@ for (const { item, inputVideo } of cases) {
     ]);
     if (preview.image !== item.phaseImages.es) item.framePreviews.push(preview);
   }
-  if (
-    encoded.frameCount !== item.frameCount ||
-    Math.abs(encoded.fps - item.fps) > 0.001
-  )
+  if (encoded.frameCount !== item.frameCount || Math.abs(encoded.fps - item.fps) > 0.001)
     throw new Error("Encoded frame sequence changed");
 }
 writeFileSync(
@@ -321,8 +298,7 @@ writeFileSync(
   JSON.stringify(
     {
       checkpointFamily: "s3_echo_model25_periodic_state",
-      predictionSource:
-        "CT-Heart/.docs/remote-pull/model25-vis/predictions.csv",
+      predictionSource: "CT-Heart/.docs/remote-pull/model25-vis/predictions.csv",
       cases: records.map((record) => ({
         id: record.id,
         dataset: record.dataset,
@@ -354,6 +330,4 @@ writeFileSync(
   ) + "\n",
 );
 copyFileSync(resolve(root, "favicon.svg"), resolve(root, "public/favicon.svg"));
-console.log(
-  `Prepared ${cases.length} model25 cases; source frame count and FPS preserved.`,
-);
+console.log(`Prepared ${cases.length} model25 cases; source frame count and FPS preserved.`);

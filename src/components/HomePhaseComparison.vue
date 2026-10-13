@@ -27,9 +27,7 @@ const phases = computed(() =>
 
 <template>
   <div class="mt-4" aria-label="同一影片的充盈與收縮量測畫面">
-    <div
-      class="mb-2 flex items-center justify-between text-[10px] text-[#627d88]"
-    >
+    <div class="mb-2 flex items-center justify-between text-[10px] text-[#627d88]">
       <span class="flex items-center gap-1.5"
         ><Icon name="clock" :size="13" />從同一段影片，找到兩個關鍵時刻</span
       >

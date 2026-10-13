@@ -1,9 +1,7 @@
 import type { DemoCase, Metric } from "../types";
 
-export const assetUrl = (path: string) =>
-  `${import.meta.env.BASE_URL}demo/${path}`;
-export const formatMetric = (metric: Metric) =>
-  `${metric.value.toFixed(1)} ${metric.unit}`;
+export const assetUrl = (path: string) => `${import.meta.env.BASE_URL}demo/${path}`;
+export const formatMetric = (metric: Metric) => `${metric.value.toFixed(1)} ${metric.unit}`;
 export const metricRoute = (item: DemoCase, metric?: Metric) =>
   `#/case/${encodeURIComponent(item.id)}${metric ? `?metric=${encodeURIComponent(metric.id)}` : ""}`;
 
