@@ -74,7 +74,7 @@ async function waitFrame(caseId, metricId) {
   );
 }
 try {
-  await page.goto(origin);
+  await page.goto(`${origin}#/showcase`);
   await page.locator("[data-home-metric]").first().waitFor();
   assert.deepEqual(
     await page
@@ -124,7 +124,7 @@ try {
   await page.keyboard.press("ArrowRight");
   assert.equal(Number(await page.getByRole("slider").inputValue()), before + 1);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto(`${origin}#/`);
+  await page.goto(`${origin}#/showcase`);
   await page.reload();
   await page.getByRole("button", { name: "開始首頁自動演示" }).waitFor();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();

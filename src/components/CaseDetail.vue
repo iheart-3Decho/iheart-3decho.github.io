@@ -54,7 +54,7 @@ onBeforeUnmount(stop);
     class="mx-auto grid h-dvh w-full grid-rows-[54px_minmax(0,1fr)_24px] overflow-hidden px-7 py-3 text-[#193240]"
   >
     <header class="flex min-h-0 items-center justify-between gap-5 border-b border-[#dfe7ec]">
-      <a href="#/" aria-label="返回 iHeart 首頁" class="flex items-center gap-2.5"
+      <a href="#/showcase" aria-label="返回 iHeart 首頁" class="flex items-center gap-2.5"
         ><span
           class="grid size-[38px] place-items-center rounded-xl bg-[linear-gradient(145deg,_#278aa4,_#136962)] text-white shadow-sm"
           ><Icon name="heart" :size="23" /></span
@@ -71,7 +71,7 @@ onBeforeUnmount(stop);
           item.dataset
         }}</small>
       </div>
-      <a href="#/" class="flex items-center gap-1.5 text-[12px] text-[#277d7d]"
+      <a href="#/showcase" class="flex items-center gap-1.5 text-[12px] text-[#277d7d]"
         ><Icon name="arrow" :size="14" class="rotate-180" />所有病例</a
       >
       <button

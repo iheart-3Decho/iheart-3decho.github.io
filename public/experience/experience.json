@@ -1,0 +1,220 @@
+{
+  "function": {
+    "caseId": "function",
+    "sourceId": "0X100CF05D141FF143",
+    "checkpointSha256": "8322f7bd1a216bd40bc028a709726d90d1dd528ea4102831c872846a5f6c243f",
+    "video": {
+      "path": "function.mp4",
+      "width": 112,
+      "height": 112,
+      "fps": 50,
+      "frameCount": 248
+    },
+    "coordinateTransform": {
+      "original_size_wh": [
+        112,
+        112
+      ],
+      "model_size_wh": [
+        512,
+        384
+      ],
+      "resize_size_wh": [
+        384,
+        384
+      ],
+      "pad_ltrb": [
+        64,
+        0,
+        64,
+        0
+      ],
+      "original_pixel_formula": [
+        "x=(normalized_x*512-64)/384*112",
+        "y=normalized_y*112"
+      ],
+      "contour_normalization": "decoder x/(width-1), y/(height-1), matching official exporter",
+      "points_outside_source": "preserved_unclipped"
+    },
+    "metrics": {
+      "ef": {
+        "value": 56.39103651046753,
+        "unit": "%",
+        "label": "射血分數"
+      },
+      "edv": {
+        "value": 66.96462482213974,
+        "unit": "mL",
+        "label": "充盈時容積"
+      },
+      "esv": {
+        "value": 29.202579706907272,
+        "unit": "mL",
+        "label": "收縮後容積"
+      }
+    },
+    "evidence": {
+      "ed": {
+        "frame": 72,
+        "image": "function-ed.png",
+        "imageSize": [
+          672,
+          672
+        ],
+        "geometry": "actual_per_frame_prediction"
+      },
+      "es": {
+        "frame": 88,
+        "image": "function-es.png",
+        "imageSize": [
+          672,
+          672
+        ],
+        "geometry": "actual_per_frame_prediction"
+      }
+    }
+  },
+  "dimension": {
+    "caseId": "dimension",
+    "sourceId": "0X100EC1C77A847AA7",
+    "checkpointSha256": "8322f7bd1a216bd40bc028a709726d90d1dd528ea4102831c872846a5f6c243f",
+    "video": {
+      "path": "dimension.mp4",
+      "width": 1024,
+      "height": 768,
+      "fps": 65,
+      "frameCount": 225
+    },
+    "coordinateTransform": {
+      "original_size_wh": [
+        1024,
+        768
+      ],
+      "center_crop_xywh": [
+        0,
+        0,
+        1024,
+        768
+      ],
+      "crop_resize_size_wh": [
+        640,
+        480
+      ],
+      "model_size_wh": [
+        512,
+        384
+      ],
+      "pad_ltrb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_pixel_formula": [
+        "x=normalized_x*crop_width+crop_left",
+        "y=normalized_y*crop_height+crop_top"
+      ],
+      "points_outside_source": "preserved_unclipped"
+    },
+    "metrics": {
+      "ivsd": {
+        "value": 16.006388664245605,
+        "unit": "mm",
+        "label": "室間隔厚度"
+      },
+      "lvidd": {
+        "value": 51.0015869140625,
+        "unit": "mm",
+        "label": "充盈時心室內徑"
+      },
+      "lvids": {
+        "value": 38.63269567489624,
+        "unit": "mm",
+        "label": "收縮時心室內徑"
+      },
+      "lvpwd": {
+        "value": 15.465093851089478,
+        "unit": "mm",
+        "label": "心室後壁厚度"
+      }
+    },
+    "evidence": {
+      "ivsd": {
+        "frame": 108,
+        "image": "dimension-ivsd.png",
+        "imageSize": [
+          1024,
+          768
+        ],
+        "points": [
+          [
+            496.3206787109375,
+            314.4943313598633
+          ],
+          [
+            534.9906616210938,
+            263.4134216308594
+          ]
+        ],
+        "geometry": "actual_per_frame_prediction"
+      },
+      "lvidd": {
+        "frame": 108,
+        "image": "dimension-lvidd.png",
+        "imageSize": [
+          1024,
+          768
+        ],
+        "points": [
+          [
+            438.9678955078125,
+            497.2738494873047
+          ],
+          [
+            496.3206787109375,
+            314.4943313598633
+          ]
+        ],
+        "geometry": "actual_per_frame_prediction"
+      },
+      "lvids": {
+        "frame": 130,
+        "image": "dimension-lvids.png",
+        "imageSize": [
+          1024,
+          768
+        ],
+        "points": [
+          [
+            411.5805969238281,
+            453.6294708251953
+          ],
+          [
+            483.3168640136719,
+            313.47823333740234
+          ]
+        ],
+        "geometry": "actual_per_frame_prediction"
+      },
+      "lvpwd": {
+        "frame": 108,
+        "image": "dimension-lvpwd.png",
+        "imageSize": [
+          1024,
+          768
+        ],
+        "points": [
+          [
+            425.6937255859375,
+            564.5474853515625
+          ],
+          [
+            438.9678955078125,
+            497.2738494873047
+          ]
+        ],
+        "geometry": "actual_per_frame_prediction"
+      }
+    }
+  }
+}

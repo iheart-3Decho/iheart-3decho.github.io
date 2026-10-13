@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.13.1",
   "scripts": {
+    "lint": "oxlint --deny-warnings src scripts && oxfmt --check src scripts package.json README.md docs",
+    "check:types": "vue-tsc --noEmit",
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "prepare:demo": "node scripts/prepare-demo.mjs",
     "check:data": "node scripts/check-data.mjs",
-    "check:browser": "node scripts/check-browser.mjs"
+    "check:browser": "node scripts/check-browser.mjs",
+    "prepare:experience": "node scripts/prepare-experience.mjs",
+    "check:experience": "node scripts/check-experience.mjs",
+    "check:soak": "node scripts/soak-experience.mjs"
   },
   "dependencies": {
     "vue": "^3.5.0"
@@ -19,10 +23,13 @@
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-vue": "^6.0.0",
     "csv-parse": "^7.0.3",
+    "oxfmt": "0.58.0",
+    "oxlint": "1.74.0",
     "playwright": "^1.64.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.0",
     "vite": "^8.0.0",
     "vue-tsc": "^3.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.13.1"
 }

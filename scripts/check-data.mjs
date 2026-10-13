@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 const root = new URL("../public/demo/", import.meta.url);
@@ -58,6 +58,33 @@ assert.equal(f.phases.ed.frame / f.fps, 1.44);
 assert.equal(f.phases.es.frame / f.fps, 1.76);
 assert.equal(cases.filter((item) => item.kind === "function").length, 3);
 assert.equal(cases.filter((item) => item.kind === "dimension").length, 3);
+const experienceRoot = new URL("../public/experience/", import.meta.url);
+const experience = JSON.parse(readFileSync(new URL("experience.json", experienceRoot)));
+assert.equal(experience.function.checkpointSha256, experience.dimension.checkpointSha256);
+assert.notEqual(experience.function.sourceId, experience.dimension.sourceId);
+for (const kind of ["function", "dimension"]) {
+  const entry = experience[kind],
+    item = cases.find((c) => c.id === entry.caseId);
+  assert.equal(entry.sourceId, item.sourceId);
+  for (const [id, metric] of Object.entries(entry.metrics)) {
+    const original = item.metrics.find((m) => m.id === id);
+    assert.ok(Math.abs(metric.value - original.value) < 0.0001);
+    assert.equal(metric.unit, original.unit);
+  }
+  for (const frame of Object.values(entry.evidence)) {
+    assert.ok(Number.isInteger(frame.frame) && frame.frame >= 0 && frame.frame < item.frameCount);
+    assert.equal(frame.geometry, "actual_per_frame_prediction");
+    assert.ok(existsSync(new URL(frame.image, experienceRoot)));
+    const png = readFileSync(new URL(frame.image, experienceRoot));
+    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], frame.imageSize);
+    assert.ok(Math.abs(frame.imageSize[0] / frame.imageSize[1] - item.width / item.height) < 0.001);
+    for (const [x, y] of frame.points || [])
+      assert.ok(x >= 0 && x <= item.width && y >= 0 && y <= item.height);
+  }
+}
+console.log(
+  "PASS: independent experience values/units, same checkpoint, distinct cases and uncropped frame-specific overlays.",
+);
 for (const item of cases.filter((entry) => entry.kind === "dimension")) {
   for (const id of ["ivsd", "lvidd", "lvids", "lvpwd"])
     assert.ok(

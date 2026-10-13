@@ -40,7 +40,7 @@ onBeforeUnmount(() => {
     <header
       class="relative z-10 flex h-[62px] w-full items-center justify-between border-b border-line"
     >
-      <a href="#/" aria-label="iHeart 首頁" class="flex items-center gap-2.5"
+      <a href="#/showcase" aria-label="iHeart 首頁" class="flex items-center gap-2.5"
         ><span
           class="grid size-[37px] place-items-center rounded-xl bg-[linear-gradient(145deg,_#278aa4,_#136962)] text-white shadow-sm"
           ><Icon name="heart" :size="21" /></span
