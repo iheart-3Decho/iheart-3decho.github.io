@@ -76,6 +76,7 @@ onBeforeUnmount(() => clearInterval(timer));
         :key="mode"
         class="h-full w-full object-contain"
         :src="assetUrl(item.video)"
+        :poster="assetUrl(item.poster)"
         :autoplay="!reduced"
         :controls="reduced"
         muted

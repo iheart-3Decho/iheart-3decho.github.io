@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, ref } from "vue";
 import Icon from "../Icon.vue";
 import type { DemoCase, Point } from "../../types";
 import type { FrameSelection } from "../../experience/types";
-import { assetUrl } from "../../utils/demo";
+import { assetUrl, formatPosition } from "../../utils/demo";
 
 const props = defineProps<{
   item: DemoCase;
@@ -339,7 +339,7 @@ defineExpose({ capture, seek, pause });
             <Icon name="reload" :size="16" />重播
           </button>
           <span class="ml-auto text-[14px] text-muted tabular-nums"
-            >{{ (frame / item.fps).toFixed(2) }} / {{ item.duration.toFixed(2) }} 秒</span
+            >{{ formatPosition(item, frame) }} · 第 {{ frame + 1 }} / {{ item.frameCount }} 幀</span
           >
         </div>
         <input

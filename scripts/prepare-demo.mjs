@@ -2,12 +2,45 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { parse } from "csv-parse/sync";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const project = resolve(root, "..");
 const destination = resolve(root, "public/demo");
 mkdirSync(destination, { recursive: true });
+const tedDirectory = resolve(root, "private-source/ted-case");
+const ted = JSON.parse(readFileSync(resolve(tedDirectory, "prediction.json"), "utf8"));
+const hash = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
+const tedReference = Object.fromEntries(
+  [
+    "case_id",
+    "dataset",
+    "checkpoint_sha256",
+    "source_image",
+    "source_raw_sha256",
+    "source_frame_count",
+    "video",
+    "time_basis",
+    "acquisition_fps",
+    "timing_note",
+    "model_protocol",
+    "validation_scope",
+    "coordinate_transform",
+    "predictions",
+    "phases",
+  ].map((key) => [key, ted[key]]),
+);
+tedReference.assetSha256 = Object.fromEntries(
+  ["function.mp4", "function-ed.png", "function-es.png"].map((file) => [
+    file,
+    hash(resolve(tedDirectory, file)),
+  ]),
+);
+writeFileSync(
+  resolve(destination, "ted-prediction.json"),
+  `${JSON.stringify(tedReference, null, 2)}\n`,
+);
 const csvPath = resolve(project, "CT-Heart/.docs/remote-pull/model25-vis/predictions.csv");
 const rows = parse(readFileSync(csvPath, "utf8"), {
   columns: true,
@@ -17,11 +50,11 @@ const specs = [
   {
     id: "function",
     title: "泵血功能案例 01",
-    source: "dynamic",
-    sourceId: "0X100CF05D141FF143",
-    dataset: "EchoNet-Dynamic",
+    source: "ted",
+    sourceId: ted.case_id,
+    dataset: "TED",
     view: "心尖四腔心切面",
-    file: resolve(project, "STG/PPTX/2026-10-04/assets/clinical/0X100CF05D141FF143.avi"),
+    file: resolve(tedDirectory, "function.mp4"),
   },
   {
     id: "function-27",
@@ -71,7 +104,8 @@ const specs = [
 ];
 const records = specs.map((spec) => {
   const row = rows.find((r) => r.patient_id === spec.sourceId && r.source === spec.source);
-  if (!row) throw new Error(`Missing model25 prediction: ${spec.sourceId}`);
+  if (!row && spec.source !== "ted")
+    throw new Error(`Missing model25 prediction: ${spec.sourceId}`);
   if (!existsSync(spec.file)) throw new Error(`Missing source video: ${spec.file}`);
   return { ...spec, row, video: `${spec.id}.mp4`, poster: `${spec.id}-ed.jpg` };
 });
@@ -135,6 +169,65 @@ const names = [
 ];
 const cases = records.map((record) => {
   const metadata = probe(record.file);
+  if (record.source === "ted") {
+    if (metadata.frameCount !== ted.source_frame_count)
+      throw new Error("TED export lost original source frames");
+    const phase = (id) => ({
+      frame: ted.phases[id].frame,
+      geometry: { kind: "contour", points: ted.phases[id].contour_display_pixels },
+    });
+    const ed = phase("ed"),
+      es = phase("es");
+    const item = {
+      id: record.id,
+      caseTitle: record.title,
+      kind: "function",
+      label: "泵血功能",
+      dataset: record.dataset,
+      view: record.view,
+      sourceId: record.sourceId,
+      video: record.video,
+      poster: record.poster,
+      ...metadata,
+      timeBasis: "cycle",
+      acquisitionFps: null,
+      phases: { ed, es },
+      metrics: [
+        {
+          id: "ef",
+          code: "EF",
+          label: "射血分數",
+          value: ted.predictions.ef_percent,
+          unit: "%",
+          description: "一次收縮泵出的血量，佔充盈時血量的比例。",
+          phase: "ed",
+          evidence: ed,
+        },
+        {
+          id: "edv",
+          code: "EDV",
+          label: "充盈時容積",
+          value: ted.predictions.edv_ml,
+          unit: "mL",
+          description: "心室充滿血液、準備收縮時的血量。",
+          phase: "ed",
+          evidence: ed,
+        },
+        {
+          id: "esv",
+          code: "ESV",
+          label: "收縮後容積",
+          value: ted.predictions.esv_ml,
+          unit: "mL",
+          description: "心室完成收縮後，仍留在心室內的血量。",
+          phase: "es",
+          evidence: es,
+        },
+      ],
+      volumeSeries: ted.volume_series,
+    };
+    return { item, inputVideo: record.file };
+  }
   if (record.source === "lvh" && metadata.width / metadata.height !== 4 / 3)
     throw new Error(`${record.sourceId}: LVH crop needs an explicit transform`);
   const item = {
@@ -214,30 +307,32 @@ const cases = records.map((record) => {
   return { item, inputVideo: record.file };
 });
 for (const { item, inputVideo } of cases) {
-  execFileSync("ffmpeg", [
-    "-hide_banner",
-    "-loglevel",
-    "error",
-    "-y",
-    "-i",
-    inputVideo,
-    "-map",
-    "0:v:0",
-    "-an",
-    "-c:v",
-    "libx264",
-    "-crf",
-    "18",
-    "-preset",
-    "medium",
-    "-pix_fmt",
-    "yuv420p",
-    "-fps_mode",
-    "passthrough",
-    "-movflags",
-    "+faststart",
-    resolve(destination, item.video),
-  ]);
+  if (item.dataset === "TED") copyFileSync(inputVideo, resolve(destination, item.video));
+  else
+    execFileSync("ffmpeg", [
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      inputVideo,
+      "-map",
+      "0:v:0",
+      "-an",
+      "-c:v",
+      "libx264",
+      "-crf",
+      "18",
+      "-preset",
+      "medium",
+      "-pix_fmt",
+      "yuv420p",
+      "-fps_mode",
+      "passthrough",
+      "-movflags",
+      "+faststart",
+      resolve(destination, item.video),
+    ]);
   const posterFrame = item.phases.ed.frame;
   execFileSync("ffmpeg", [
     "-hide_banner",
@@ -311,17 +406,31 @@ writeFileSync(
         modelInput: {
           width: 512,
           height: 384,
-          ...(record.source === "dynamic"
-            ? { leftPadding: 64, topPadding: 0 }
-            : { officialCenterCrop: "none for 4:3 source" }),
+          ...(record.source === "ted"
+            ? ted.coordinate_transform
+            : record.source === "dynamic"
+              ? { leftPadding: 64, topPadding: 0 }
+              : { officialCenterCrop: "none for 4:3 source" }),
         },
         geometry:
-          record.source === "dynamic"
-            ? "metric-family evidence-aggregated model output; not dense framewise segmentation"
-            : "metric-family evidence-aggregated model endpoints",
+          record.source === "ted"
+            ? "Actual function-head per-frame contour at the corresponding predicted ED/ES evidence frame."
+            : record.source === "dynamic"
+              ? "metric-family evidence-aggregated model output; not dense framewise segmentation"
+              : "metric-family evidence-aggregated model endpoints",
       })),
       timing:
-        "Use source container FPS; LVH annotation CSV FPS differs from the AVI. Playback uses the AVI timebase.",
+        "TED: complete original frame sequence, physical pixel aspect restored, 30 fps presentation playback only; acquisition FPS is unverified and UI uses cycle progress. Other cases: use source container FPS; LVH annotation CSV FPS differs from AVI.",
+      tedExport: {
+        caseId: ted.case_id,
+        checkpointSha256: ted.checkpoint_sha256,
+        sourceImage: ted.source_image,
+        sourceRawSha256: ted.source_raw_sha256,
+        sourceFrameCount: ted.source_frame_count,
+        coordinateTransform: ted.coordinate_transform,
+        protocol: ted.model_protocol,
+        validationScope: ted.validation_scope,
+      },
       rights:
         "Public demo distribution authorization confirmed by the user for the selected case videos and model outputs.",
     },

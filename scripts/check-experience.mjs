@@ -4,7 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 const origin = process.env.DEMO_URL || "http://127.0.0.1:4173/";
-const output = resolve("private-source/booth-validation");
+const output = resolve(process.env.VALIDATION_DIR || "private-source/booth-validation");
 mkdirSync(output, { recursive: true });
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
@@ -12,6 +12,11 @@ const page = await context.newPage(),
   errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 const data = JSON.parse(readFileSync("public/experience/experience.json"));
+const chosenED = data.function.evidence.ed.frame;
+const chosenES = data.function.evidence.es.frame;
+const editedED =
+  (chosenED + Math.floor(data.function.video.frameCount / 2)) % data.function.video.frameCount;
+const editedES = editedED === chosenES ? (chosenES + 1) % data.function.video.frameCount : chosenES;
 async function phase(name) {
   await page.locator(`[data-booth][data-phase="${name}"]`).waitFor();
 }
@@ -74,21 +79,25 @@ async function decodedMatch(frame) {
     const rgba = ctx.getImageData(0, 0, img.width, img.height).data;
     return Array.from(rgba).filter((_, i) => i % 4 !== 3);
   }, src);
-  const expected = execFileSync("ffmpeg", [
-    "-v",
-    "error",
-    "-i",
-    resolve("public/demo", data.function.video.path),
-    "-vf",
-    `select=eq(n\\,${frame})`,
-    "-frames:v",
-    "1",
-    "-f",
-    "rawvideo",
-    "-pix_fmt",
-    "rgb24",
-    "pipe:1",
-  ]);
+  const expected = execFileSync(
+    "ffmpeg",
+    [
+      "-v",
+      "error",
+      "-i",
+      resolve("public/demo", data.function.video.path),
+      "-vf",
+      `select=eq(n\\,${frame})`,
+      "-frames:v",
+      "1",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgb24",
+      "pipe:1",
+    ],
+    { maxBuffer: data.function.video.width * data.function.video.height * 4 },
+  );
   assert.equal(pixels.length, expected.length);
   const difference =
     pixels.reduce((sum, p, i) => sum + Math.abs(p - expected[i]), 0) / pixels.length;
@@ -97,6 +106,7 @@ async function decodedMatch(frame) {
 try {
   await page.goto(origin);
   await phase("attract");
+  await page.waitForFunction(() => document.querySelector("[data-attract] video")?.readyState >= 2);
   await fit("01-attract");
   await page.waitForFunction(
     () => document.querySelector("[data-attract] video")?.currentTime > 0.1,
@@ -134,31 +144,44 @@ try {
   await page.locator("[data-confirm]:enabled").waitFor();
   assert.equal(Number(await page.getByRole("slider").inputValue()), 10);
   await fit("02-select-ed");
-  await choose(72);
+  await choose(chosenED);
   await phase("es");
   await fit("03-select-es");
-  await choose(72);
+  await choose(chosenED);
   await page.getByRole("alert").waitFor();
   await phase("es");
-  await choose(88);
+  await choose(chosenES);
   await phase("review");
   await fit("04-pump-review");
-  await decodedMatch(72);
+  await decodedMatch(chosenED);
   await page.locator("[data-review]").getByRole("button", { name: "修改" }).first().click();
   await phase("ed");
   await page.waitForFunction(
-    () => Number(document.querySelector('input[type="range"]').value) === 72,
+    (frame) => Number(document.querySelector('input[type="range"]').value) === frame,
+    chosenED,
   );
-  await choose(132);
-  await choose(148);
-  await decodedMatch(132);
+  await choose(editedED);
+  await choose(editedES);
+  await decodedMatch(editedED);
   await page.locator("[data-reveal]").click();
   await phase("results");
   await fit("05-pump-result");
   assert.equal(await page.locator("[data-comparison]").count(), 2);
-  await page.getByText("56.4", { exact: false }).first().waitFor();
-  assert.ok((await page.locator("[data-results]").innerText()).includes("67.0 mL"));
-  assert.ok((await page.locator("[data-results]").innerText()).includes("29.2 mL"));
+  await page
+    .getByText(data.function.metrics.ef.value.toFixed(1), { exact: false })
+    .first()
+    .waitFor();
+  assert.ok(
+    (await page.locator("[data-results]").innerText()).includes(
+      `${data.function.metrics.edv.value.toFixed(1)} mL`,
+    ),
+  );
+  assert.ok(
+    (await page.locator("[data-results]").innerText()).includes(
+      `${data.function.metrics.esv.value.toFixed(1)} mL`,
+    ),
+  );
+  assert.ok((await page.locator("[data-comparison]").first().innerText()).includes("週期"));
   await page.getByRole("button", { name: "量測解讀的資料來源" }).click();
   await fit("06-medical-sources");
   await page.getByRole("button", { name: "返回體驗" }).click();
@@ -250,8 +273,8 @@ try {
       await draw();
       await page.locator("[data-confirm]").click();
     } else {
-      await choose(72);
-      await choose(88);
+      await choose(chosenED);
+      await choose(chosenES);
     }
     await page.locator("[data-reveal]").click();
     await phase("results");
@@ -287,8 +310,8 @@ try {
   await page.reload();
   await phase("attract");
   await page.locator("[data-start]").click();
-  await choose(72);
-  await choose(88);
+  await choose(chosenED);
+  await choose(chosenES);
   await page.locator("[data-reveal]").click();
   await phase("results");
   assert.deepEqual(errors, []);
@@ -307,8 +330,8 @@ try {
   await page.waitForFunction(() => document.querySelector("video")?.readyState >= 2);
   await context.unroute("**/function.mp4");
   await page.locator("[data-start]").click();
-  await choose(72);
-  await choose(88);
+  await choose(chosenED);
+  await choose(chosenES);
   let failImage = true;
   await context.route("**/function-ed.png", (route) => {
     if (failImage) {
@@ -336,7 +359,8 @@ try {
         status: "passed",
         at: new Date().toISOString(),
         interactions: 100,
-        framePixels: "MP4 frames 72 and 132 compared against ffmpeg",
+        framePixels: `MP4 frames ${chosenED} and ${editedED} compared against ffmpeg`,
+        sourceId: data.function.sourceId,
         baseline,
         after,
         initialHeap,

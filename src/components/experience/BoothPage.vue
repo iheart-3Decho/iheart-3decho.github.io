@@ -15,6 +15,7 @@ import BoothResults from "./BoothResults.vue";
 import TaskPlayer from "./TaskPlayer.vue";
 import HeartSketch from "./HeartSketch.vue";
 import Icon from "../Icon.vue";
+import { formatPosition } from "../../utils/demo";
 const props = defineProps<{ cases: DemoCase[]; data: ExperienceData }>();
 const phase = ref<ExperiencePhase>("attract"),
   mode = ref<ExperienceMode>("function"),
@@ -231,7 +232,7 @@ onBeforeUnmount(() => clearTimeout(revealTimer));
               <figcaption class="flex items-center justify-between pt-4 text-[17px]">
                 <span
                   >{{ mode === "function" ? (i === 0 ? "充盈最大" : "收縮最小") : guide.label }} ·
-                  {{ (snapshot!.frame / item.fps).toFixed(2) }} 秒</span
+                  {{ formatPosition(item, snapshot!.frame) }}</span
                 ><button
                   class="text-blue underline underline-offset-4"
                   :disabled="phase === 'revealing'"

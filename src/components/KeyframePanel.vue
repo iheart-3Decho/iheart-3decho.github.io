@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import FrameThumb from "./FrameThumb.vue";
 import type { DemoCase } from "../types";
+import { formatPosition } from "../utils/demo";
 const props = defineProps<{ item: DemoCase; time: number }>();
 const emit = defineEmits<{ phase: [value: "ed" | "es"] }>();
 const entries = computed(() =>
@@ -55,7 +56,7 @@ const entries = computed(() =>
               class="h-1.5 w-1.5 rounded-full"
               :class="entry.phase === 'ed' ? 'bg-[#419890]' : 'bg-[#6b8fc8]'"
             />{{ entry.title }}</span
-          ><b>{{ (entry.metric.evidence.frame / item.fps).toFixed(2) }}<small>秒</small></b>
+          ><b>{{ formatPosition(item, entry.metric.evidence.frame) }}</b>
         </div>
         <FrameThumb
           :item="item"

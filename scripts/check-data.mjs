@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 const root = new URL("../public/demo/", import.meta.url);
 const cases = JSON.parse(readFileSync(new URL("cases.json", root)));
 assert.equal(cases.length, 6);
@@ -53,14 +54,49 @@ for (const item of cases.filter((entry) => entry.kind === "function")) {
 const f = cases.find((item) => item.id === "function") ?? cases[0];
 const [ef, edv, esv] = f.metrics;
 assert.ok(Math.abs(ef.value - (1 - esv.value / edv.value) * 100) < 0.001);
-assert.equal(ef.value.toFixed(1), "56.4");
-assert.equal(f.phases.ed.frame / f.fps, 1.44);
-assert.equal(f.phases.es.frame / f.fps, 1.76);
+const ted = JSON.parse(readFileSync(new URL("ted-prediction.json", root)));
+for (const [file, expected] of Object.entries(ted.assetSha256)) {
+  const directory = file.endsWith(".mp4")
+    ? root
+    : new URL("../public/experience/", import.meta.url);
+  assert.equal(
+    createHash("sha256")
+      .update(readFileSync(new URL(file, directory)))
+      .digest("hex"),
+    expected,
+    `TED asset differs from original inference export: ${file}`,
+  );
+}
+assert.equal(f.dataset, "TED");
+assert.equal(f.sourceId, ted.case_id);
+assert.equal(f.timeBasis, "cycle");
+assert.equal(f.frameCount, ted.source_frame_count);
+assert.equal(f.phases.ed.frame, ted.phases.ed.frame);
+assert.equal(f.phases.es.frame, ted.phases.es.frame);
+assert.notEqual(f.phases.ed.frame, f.phases.es.frame);
+assert.equal(ef.value, ted.predictions.ef_percent);
+assert.equal(edv.value, ted.predictions.edv_ml);
+assert.equal(esv.value, ted.predictions.esv_ml);
+assert.deepEqual([f.width, f.height], ted.coordinate_transform.display_size_wh);
+assert.ok(
+  f.width > 500 && f.height > 400,
+  "Use native high-resolution source, not enlarged 112px video",
+);
+const aspect = ted.coordinate_transform;
+assert.ok(
+  Math.abs(
+    f.width / f.height -
+      (aspect.raw_size_wh[0] * aspect.raw_spacing_xy_mm[0]) /
+        (aspect.raw_size_wh[1] * aspect.raw_spacing_xy_mm[1]),
+  ) < 0.003,
+  "Restore physical pixel aspect",
+);
 assert.equal(cases.filter((item) => item.kind === "function").length, 3);
 assert.equal(cases.filter((item) => item.kind === "dimension").length, 3);
 const experienceRoot = new URL("../public/experience/", import.meta.url);
 const experience = JSON.parse(readFileSync(new URL("experience.json", experienceRoot)));
 assert.equal(experience.function.checkpointSha256, experience.dimension.checkpointSha256);
+assert.equal(experience.function.checkpointSha256, ted.checkpoint_sha256);
 assert.notEqual(experience.function.sourceId, experience.dimension.sourceId);
 for (const kind of ["function", "dimension"]) {
   const entry = experience[kind],

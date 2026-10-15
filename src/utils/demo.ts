@@ -2,6 +2,12 @@ import type { DemoCase, Metric } from "../types";
 
 export const assetUrl = (path: string) => `${import.meta.env.BASE_URL}demo/${path}`;
 export const formatMetric = (metric: Metric) => `${metric.value.toFixed(1)} ${metric.unit}`;
+// TED preserves frame order but has no verified acquisition FPS. Its video FPS
+// is presentation speed, so locate evidence by cardiac-cycle progress in the UI.
+export const formatPosition = (item: DemoCase, frame: number) =>
+  item.timeBasis === "cycle"
+    ? `${Math.round((frame / Math.max(1, item.frameCount - 1)) * 100)}% 週期`
+    : `${(frame / item.fps).toFixed(2)} 秒`;
 export const metricRoute = (item: DemoCase, metric?: Metric) =>
   `#/case/${encodeURIComponent(item.id)}${metric ? `?metric=${encodeURIComponent(metric.id)}` : ""}`;
 

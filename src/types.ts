@@ -33,6 +33,7 @@ export interface DemoCase {
   fps: number;
   frameCount: number;
   duration: number;
+  timeBasis?: "cycle";
   phases: { ed: Evidence; es: Evidence };
   metrics: Metric[];
   volumeSeries?: { frame: number; value: number }[];

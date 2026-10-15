@@ -3,6 +3,7 @@ import type { DemoCase, Point } from "../../types";
 import type { FrameResult, FrameSelection } from "../../experience/types";
 import { experienceAsset } from "../../experience/types";
 import EvidenceImage from "./EvidenceImage.vue";
+import { formatPosition } from "../../utils/demo";
 defineProps<{
   item: DemoCase;
   selected: FrameSelection;
@@ -50,9 +51,7 @@ defineProps<{
         </div>
         <figcaption class="flex justify-between pt-2 text-[14px]">
           <span class="text-[#946a25]">你的選擇</span
-          ><span class="tabular-nums text-muted"
-            >{{ (selected.frame / item.fps).toFixed(2) }} 秒</span
-          >
+          ><span class="tabular-nums text-muted">{{ formatPosition(item, selected.frame) }}</span>
         </figcaption>
       </figure>
       <figure class="flex min-h-0 flex-col">
@@ -65,7 +64,7 @@ defineProps<{
         </div>
         <figcaption class="flex justify-between pt-2 text-[14px]">
           <span class="text-brand">AI 選擇 · {{ points ? "端點與量測線" : "心室輪廓" }}</span
-          ><span class="tabular-nums text-muted">{{ (ai.frame / item.fps).toFixed(2) }} 秒</span>
+          ><span class="tabular-nums text-muted">{{ formatPosition(item, ai.frame) }}</span>
         </figcaption>
       </figure>
     </div>
@@ -84,7 +83,7 @@ defineProps<{
       <circle :cx="12 + (ai.frame / (item.frameCount - 1)) * 776" cy="27" r="6" fill="#147e7d" />
       <text x="12" y="39" font-size="10" fill="#718390">影片開始</text>
       <text x="788" y="39" text-anchor="end" font-size="10" fill="#718390">
-        {{ item.duration.toFixed(2) }} 秒
+        {{ formatPosition(item, item.frameCount - 1) }}
       </text>
     </svg>
   </section>

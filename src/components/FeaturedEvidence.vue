@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import Icon from "./Icon.vue";
-import { assetUrl, formatMetric, metricMeaning, metricRoute } from "../utils/demo";
+import { assetUrl, formatMetric, formatPosition, metricMeaning, metricRoute } from "../utils/demo";
 import type { MetricDemo } from "../utils/demo";
 
 const props = defineProps<{ demo: MetricDemo; automatic: boolean }>();
@@ -158,11 +158,13 @@ onBeforeUnmount(() => {
           }}</span
           ><strong class="text-[20px] font-medium text-ink tabular-nums"
             >{{
-              located
-                ? (demo.metric.evidence.frame / demo.item.fps).toFixed(2)
-                : currentTime.toFixed(2)
-            }}
-            <small class="text-[11px]">秒</small></strong
+              formatPosition(
+                demo.item,
+                located
+                  ? demo.metric.evidence.frame
+                  : Math.min(demo.item.frameCount - 1, Math.floor(currentTime * demo.item.fps)),
+              )
+            }} </strong
           ><span v-if="located" class="ml-3 text-[11px] text-brand"
             >{{ demo.metric.phase === "ed" ? "心室充盈" : "心室收縮"
             }}{{ demo.metric.id === "ef" ? " · 結合收縮畫面計算泵血比例" : "" }}</span
@@ -191,9 +193,8 @@ onBeforeUnmount(() => {
           <span>影片開始</span
           ><span class="text-brand"
             >{{ demo.metric.code }} · 關鍵畫面
-            {{ (demo.metric.evidence.frame / demo.item.fps).toFixed(2) }}
-            秒</span
-          ><span>{{ demo.item.duration.toFixed(2) }} 秒</span>
+            {{ formatPosition(demo.item, demo.metric.evidence.frame) }}</span
+          ><span>{{ formatPosition(demo.item, demo.item.frameCount - 1) }}</span>
         </div>
         <div class="relative h-1 rounded-full bg-[#d8e6e8]">
           <span

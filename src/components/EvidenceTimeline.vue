@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import Icon from "./Icon.vue";
 import type { DemoCase } from "../types";
+import { formatPosition } from "../utils/demo";
 const props = defineProps<{
   item: DemoCase;
   time: number;
@@ -82,12 +83,13 @@ function scrub(event: Event) {
         step="1"
         :value="Math.round(time * item.fps)"
         aria-label="拖動影片時間軸"
-        :aria-valuetext="`${time.toFixed(2)} 秒`"
+        :aria-valuetext="formatPosition(item, Math.min(lastFrame, Math.round(time * item.fps)))"
         @input="scrub"
       />
     </div>
     <div class="mt-1 flex justify-between text-[8px] tabular-nums text-[#9aacb3]">
-      <span>0.00 秒</span><span>{{ item.duration.toFixed(2) }} 秒</span>
+      <span>{{ formatPosition(item, 0) }}</span
+      ><span>{{ formatPosition(item, lastFrame) }}</span>
     </div>
     <div class="mt-2 grid grid-cols-2 gap-2 max-[650px]:hidden">
       <button
@@ -96,18 +98,14 @@ function scrub(event: Event) {
         @click="emit('phase', 'ed')"
       >
         <i class="h-1.5 w-1.5 rounded-full bg-[#419890]" />充盈最大時刻
-        <b class="ml-auto text-[13px]"
-          >{{ (item.phases.ed.frame / item.fps).toFixed(2) }}<small>秒</small></b
-        ></button
+        <b class="ml-auto text-[13px]">{{ formatPosition(item, item.phases.ed.frame) }}</b></button
       ><button
         class="flex items-center gap-1.5 rounded-lg border border-[#e0e9ed] bg-[#f9fbfc] p-2 text-left text-[9px] text-[#657d8a]"
         :class="selected === 'es' && !playing ? 'border-[#b9c9e3] bg-[#eef3fb] text-[#4573a8]' : ''"
         @click="emit('phase', 'es')"
       >
         <i class="h-1.5 w-1.5 rounded-full bg-[#6b8fc8]" />收縮最小時刻
-        <b class="ml-auto text-[13px]"
-          >{{ (item.phases.es.frame / item.fps).toFixed(2) }}<small>秒</small></b
-        >
+        <b class="ml-auto text-[13px]">{{ formatPosition(item, item.phases.es.frame) }}</b>
       </button>
     </div>
   </section>

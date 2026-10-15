@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import FrameThumb from "./FrameThumb.vue";
 import Icon from "./Icon.vue";
-import { formatMetric, metricRoute } from "../utils/demo";
+import { formatMetric, formatPosition, metricRoute } from "../utils/demo";
 import type { DemoCase } from "../types";
 
 const props = defineProps<{ item: DemoCase }>();
@@ -54,8 +54,7 @@ const phases = computed(() =>
             />{{ entry.title }}
           </div>
           <div class="mt-1 text-[17px] font-medium text-brand">
-            {{ (entry.metric.evidence.frame / item.fps).toFixed(2) }}
-            <small class="text-[10px] text-[#627d88]">秒</small>
+            {{ formatPosition(item, entry.metric.evidence.frame) }}
           </div>
           <div class="mt-1 text-[10px] text-[#627d88]">
             {{ entry.metric.label }} · {{ formatMetric(entry.metric) }}

@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import Icon from "./Icon.vue";
 import type { DemoCase, Metric } from "../types";
+import { formatPosition } from "../utils/demo";
 const props = defineProps<{
   item: DemoCase;
   metric: Metric;
@@ -37,7 +38,7 @@ const points = computed(() =>
   geometry.value?.points.map((point) => `${point[0]},${point[1]}`).join(" "),
 );
 const timeLabel = computed(
-  () => `${currentTime.value.toFixed(2)} / ${props.item.duration.toFixed(2)} 秒`,
+  () => `${formatPosition(props.item, frame.value)} · ${frame.value + 1}/${props.item.frameCount}`,
 );
 function update() {
   if (video.value) {

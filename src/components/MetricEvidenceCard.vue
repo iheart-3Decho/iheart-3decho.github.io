@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FrameThumb from "./FrameThumb.vue";
 import Icon from "./Icon.vue";
-import { assetUrl, formatMetric, metricMeaning, metricRoute } from "../utils/demo";
+import { assetUrl, formatMetric, formatPosition, metricMeaning, metricRoute } from "../utils/demo";
 import type { MetricDemo } from "../utils/demo";
 defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
 </script>
@@ -39,9 +39,9 @@ defineProps<{ demo: MetricDemo; index: number; active: boolean }>();
         class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] text-[#cfefeb]"
       >
         <span class="flex items-center gap-1.5"><Icon name="scan" :size="13" />已定位量測畫面</span>
-        <b class="font-medium tabular-nums"
-          >{{ (demo.metric.evidence.frame / demo.item.fps).toFixed(2) }} 秒</b
-        >
+        <b class="font-medium tabular-nums">{{
+          formatPosition(demo.item, demo.metric.evidence.frame)
+        }}</b>
       </div>
     </div>
 

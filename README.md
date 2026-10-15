@@ -43,7 +43,9 @@ pnpm preview
 
 1. 在論文目錄使用既有 `.scripts/ct-heart-remote/pull`，將所選 LVH 原始影片拉到本網站 `private-source/`；不直接使用 SSH。
 1. 保留项目中已有的 model25 `predictions.csv` 與 Dynamic 影片。
+1. 將 TED `patient025` 的完整本次匯出放入 `private-source/ted-case/`；解析度、時間與功能輸出驗證範圍見 [TED 病例說明](docs/ted-case.md)。
 1. 在本網站執行 `pnpm prepare:demo`，轉換 MP4、生成封面、影片縮圖及六個病例資料。
+1. 執行 `pnpm prepare:experience`，同步展台中的病例資料和實際證據幀。
 
 `public/demo/` 是已授權的可公開示範素材；`private-source/` 與包含病例素材的 `dist/` 仍保留在本地並排除 Git 提交。預覽截圖存於 `private-source/previews/`。
 
