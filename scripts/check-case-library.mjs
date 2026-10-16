@@ -46,7 +46,10 @@ async function choose(frame) {
   await page.locator("[data-confirm]:enabled").click();
 }
 try {
-  await page.clock.install();
+  // Keep network download time from advancing the controlled carousel clock.
+  const clockStart = new Date();
+  await page.clock.install({ time: clockStart });
+  await page.clock.pauseAt(clockStart);
   await page.goto(origin);
   await phase("attract");
   // Exercise real carousel code, including its complete wrap, with controlled browser time.

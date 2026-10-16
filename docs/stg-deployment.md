@@ -53,3 +53,13 @@ systemctl --user status iheart-caddy.service iheart-kiosk.service
 遠端截圖與機器可讀報告：`/home/smarthealth/demos/crf-demo/lyh/validation/20261016-library/`；本地副本：`private-source/case-library-validation/remote/`。驗證使用只監聽 localhost 的 Firefox Marionette 介面；該埠沒有公開。
 
 此為部署與功能檢查，不代替新病例的 8 小時連續運行驗收。
+
+## 同步 GitHub Pages
+
+2026-10-16 已將同一網站版本發布至 [GitHub Pages](https://iheart-3decho.github.io/)。功能與素材提交為 `b4181d8`，[構建與部署流程](https://github.com/iheart-3Decho/iheart-3decho.github.io/actions/runs/38874143155) 成功。
+
+- 線上首頁、病例 JSON、逐病例預測、互動資料及兩段 EchoXFlow MP4 的 SHA-256 均與本地構建相同。
+- 對 GitHub Pages 實際網址執行 `pnpm check:library` 與 `pnpm check:browser`，八段待機輪播、六病例互動、原六入口、鍵盤操作、減少動效及單屏布局全部通過。
+- 輪播測試先暫停虛擬時鐘，再逐段推進；下載線上素材的實際耗時不會令測試跳過預期段落。
+- STG 靜態檔案以 rsync checksum dry-run 核對，與本地構建一致；未使用的 `demo-private/` 保持排除。GitHub CI 使用已提交素材構建，不包含本地私有來源。
+- STG 重啟後的 Firefox PID 已更換；監督服務維持 active，沒有自動重啟。最終實際屏幕為心超待機首頁，Firefox 處於前台及全屏。
