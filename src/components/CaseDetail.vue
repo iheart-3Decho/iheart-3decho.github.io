@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import CaseDemo from "./CaseDemo.vue";
 import Explainer from "./Explainer.vue";
 import Icon from "./Icon.vue";
+import ImageSources from "./ImageSources.vue";
 import type { DemoCase } from "../types";
 
 const props = defineProps<{ item: DemoCase; initialMetric: string }>();
@@ -138,7 +139,7 @@ onBeforeUnmount(stop);
     >
       <span>© {{ new Date().getFullYear() }} iHeart · 心臟超聲智能分析</span
       ><span>同一模型，讓時刻、位置與量測結果連在一起。</span
-      ><span>示範病例 · 點選任何指標即可探索</span>
+      ><span class="flex items-center gap-4"><ImageSources />示範病例 · 點選任何指標即可探索</span>
     </footer>
   </div>
 </template>

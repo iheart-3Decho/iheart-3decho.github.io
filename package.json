@@ -9,11 +9,12 @@
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "prepare:demo": "node scripts/prepare-demo.mjs",
+    "prepare:demo": "node scripts/prepare-demo.mjs && node scripts/prepare-experience.mjs && node scripts/prepare-case-library.mjs",
     "check:data": "node scripts/check-data.mjs",
     "check:browser": "node scripts/check-browser.mjs",
-    "prepare:experience": "node scripts/prepare-experience.mjs",
+    "prepare:experience": "node scripts/prepare-experience.mjs && node scripts/prepare-case-library.mjs",
     "check:experience": "node scripts/check-experience.mjs",
+    "check:library": "node scripts/check-case-library.mjs",
     "check:soak": "node scripts/soak-experience.mjs"
   },
   "dependencies": {

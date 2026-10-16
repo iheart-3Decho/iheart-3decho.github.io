@@ -29,7 +29,20 @@ async function loadExperience() {
     const response = await fetch(`${import.meta.env.BASE_URL}experience/experience.json`);
     if (!response.ok) throw new Error("Missing experience");
     const data = await response.json();
-    if (!data.function?.evidence?.ed || !data.dimension?.evidence?.lvidd)
+    if (
+      !data.function?.evidence?.ed ||
+      !data.dimension?.evidence?.lvidd ||
+      !Array.isArray(data.library) ||
+      !data.library.length ||
+      !Array.isArray(data.playlist) ||
+      !data.playlist.length ||
+      !data.playlist.every((preview: { caseId: string; mode: string; metric: string }) => {
+        const entry = data.library.find(
+          (item: { caseId: string }) => item.caseId === preview.caseId,
+        );
+        return ["function", "dimension"].includes(preview.mode) && entry?.metrics?.[preview.metric];
+      })
+    )
       throw new Error("Invalid experience");
     experience.value = data;
   } catch {

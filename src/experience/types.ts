@@ -31,5 +31,13 @@ export interface ExperienceCase {
   metrics: Record<string, { value: number; unit: string; label: string }>;
   evidence: Record<string, FrameResult>;
 }
-export type ExperienceData = Record<ExperienceMode, ExperienceCase>;
+export interface ExperiencePreview {
+  caseId: string;
+  mode: ExperienceMode;
+  metric: string;
+}
+export type ExperienceData = Record<ExperienceMode, ExperienceCase> & {
+  library: ExperienceCase[];
+  playlist: ExperiencePreview[];
+};
 export const experienceAsset = (file: string) => `${import.meta.env.BASE_URL}experience/${file}`;

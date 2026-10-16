@@ -12,6 +12,9 @@ const page = await context.newPage(),
   errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 const data = JSON.parse(readFileSync("public/experience/experience.json"));
+const functionCase = JSON.parse(readFileSync("public/demo/cases.json")).find(
+  (entry) => entry.id === data.function.caseId,
+);
 const chosenED = data.function.evidence.ed.frame;
 const chosenES = data.function.evidence.es.frame;
 const editedED =
@@ -181,7 +184,11 @@ try {
       `${data.function.metrics.esv.value.toFixed(1)} mL`,
     ),
   );
-  assert.ok((await page.locator("[data-comparison]").first().innerText()).includes("週期"));
+  const edPosition =
+    functionCase.timeBasis === "cycle"
+      ? `${Math.round((chosenED / (functionCase.frameCount - 1)) * 100)}% 週期`
+      : `${(chosenED / functionCase.fps).toFixed(2)} 秒`;
+  assert.ok((await page.locator("[data-comparison]").first().innerText()).includes(edPosition));
   await page.getByRole("button", { name: "量測解讀的資料來源" }).click();
   await fit("06-medical-sources");
   await page.getByRole("button", { name: "返回體驗" }).click();
@@ -317,7 +324,8 @@ try {
   assert.deepEqual(errors, []);
   await page.getByRole("button", { name: "返回首頁", exact: true }).click();
   let failVideo = true;
-  await context.route("**/function.mp4", (route) => {
+  const functionVideo = `**/demo/${data.function.video.path}`;
+  await context.route(functionVideo, (route) => {
     if (failVideo) {
       failVideo = false;
       return route.abort();
@@ -328,12 +336,12 @@ try {
   await phase("attract");
   await page.getByRole("button", { name: "重新載入影片", exact: true }).click();
   await page.waitForFunction(() => document.querySelector("video")?.readyState >= 2);
-  await context.unroute("**/function.mp4");
+  await context.unroute(functionVideo);
   await page.locator("[data-start]").click();
   await choose(chosenED);
   await choose(chosenES);
   let failImage = true;
-  await context.route("**/function-ed.png", (route) => {
+  await context.route(`**/experience/${data.function.evidence.ed.image}`, (route) => {
     if (failImage) {
       failImage = false;
       return route.abort();

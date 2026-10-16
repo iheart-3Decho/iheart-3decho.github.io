@@ -89,13 +89,25 @@ try {
   await page.locator('[data-featured-metric="edv"]').waitFor();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();
   assert.ok(
-    Math.abs((await page.locator("video").evaluate((video) => video.currentTime)) - 2.06) < 0.02,
+    Math.abs(
+      (await page.locator("video").evaluate((video) => video.currentTime)) -
+        cases
+          .find((item) => item.id === "function-27")
+          .metrics.find((metric) => metric.id === "edv").evidence.frame /
+          cases.find((item) => item.id === "function-27").fps,
+    ) < 0.02,
   );
   await page.getByRole("button", { name: "停止首頁自動演示" }).click();
   await page.getByRole("button", { name: "展示LVIDs", exact: true }).click();
   await page.locator('svg[aria-label="關鍵畫面的模型量測位置"]').waitFor();
   assert.ok(
-    Math.abs((await page.locator("video").evaluate((video) => video.currentTime)) - 1.84) < 0.02,
+    Math.abs(
+      (await page.locator("video").evaluate((video) => video.currentTime)) -
+        cases
+          .find((item) => item.id === "dimension-03")
+          .metrics.find((metric) => metric.id === "lvids").evidence.frame /
+          cases.find((item) => item.id === "dimension-03").fps,
+    ) < 0.02,
   );
   await page.screenshot({ path: resolve(output, "home-lvids-1920.png") });
   for (const [caseId, metricId] of choices) {

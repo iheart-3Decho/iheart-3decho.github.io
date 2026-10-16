@@ -4,6 +4,7 @@ import FeaturedEvidence from "./FeaturedEvidence.vue";
 import MetricEvidenceCard from "./MetricEvidenceCard.vue";
 import HomePhaseComparison from "./HomePhaseComparison.vue";
 import Icon from "./Icon.vue";
+import ImageSources from "./ImageSources.vue";
 import { metricDemos, metricRoute } from "../utils/demo";
 import type { DemoCase } from "../types";
 
@@ -187,7 +188,9 @@ onBeforeUnmount(() => {
       <footer class="flex items-center justify-between border-t border-line text-[9px] text-muted">
         <span>iHeart · 3D Analysis &amp; Visualization</span
         ><span>同一模型，連起影片、關鍵畫面、心室輪廓與量測結果。</span
-        ><span>示範病例 · 七項指標 · 點選卡片查看完整結果</span>
+        ><span class="flex items-center gap-4"
+          ><ImageSources />示範病例 · 七項指標 · 點選卡片查看完整結果</span
+        >
       </footer>
     </main>
   </div>

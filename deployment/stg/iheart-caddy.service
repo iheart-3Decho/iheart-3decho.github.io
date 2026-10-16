@@ -1,0 +1,13 @@
+[Unit]
+Description=iHeart static booth website (Caddy)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/demos/crf-demo/lyh
+ExecStart=%h/demos/crf-demo/lyh/bin/caddy run --config %h/demos/crf-demo/lyh/Caddyfile --adapter caddyfile
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

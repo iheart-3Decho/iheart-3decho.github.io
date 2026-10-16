@@ -9,12 +9,14 @@ import type {
   FrameSelection,
 } from "../../experience/types";
 import { dimensionGuides } from "../../experience/education";
+import { findExperience } from "../../experience/catalog";
 import { useIdleReset } from "../../experience/useIdleReset";
 import BoothWelcome from "./BoothWelcome.vue";
 import BoothResults from "./BoothResults.vue";
 import TaskPlayer from "./TaskPlayer.vue";
 import HeartSketch from "./HeartSketch.vue";
 import Icon from "../Icon.vue";
+import ImageSources from "../ImageSources.vue";
 import { formatPosition } from "../../utils/demo";
 const props = defineProps<{ cases: DemoCase[]; data: ExperienceData }>();
 const phase = ref<ExperiencePhase>("attract"),
@@ -30,7 +32,9 @@ const player = ref<InstanceType<typeof TaskPlayer>>(),
   error = ref("");
 let revealTimer: ReturnType<typeof setTimeout> | undefined;
 let session = 0;
-const item = computed(() => props.cases.find((c) => c.id === props.data[mode.value].caseId)!);
+const selectedCaseId = ref("");
+const result = computed(() => findExperience(props.data, mode.value, selectedCaseId.value));
+const item = computed(() => props.cases.find((c) => c.id === result.value.caseId)!);
 const guide = computed(() => dimensionGuides[metric.value]);
 const active = computed(() => phase.value !== "attract");
 const idle = useIdleReset(active, reset);
@@ -59,11 +63,15 @@ function reset() {
   points.value = [];
   ready.value = false;
   metric.value = "lvidd";
+  selectedCaseId.value = "";
   phase.value = "attract";
 }
-function start(next: ExperienceMode) {
+function start(next: ExperienceMode, caseId?: string, nextMetric?: string) {
   reset();
   mode.value = next;
+  selectedCaseId.value = findExperience(props.data, next, caseId).caseId;
+  if (next === "dimension" && nextMetric && nextMetric in dimensionGuides)
+    metric.value = nextMetric as DimensionMetric;
   phase.value = next === "function" ? "ed" : "frame";
 }
 async function edit(target: ExperiencePhase) {
@@ -161,6 +169,7 @@ onBeforeUnmount(() => clearTimeout(revealTimer));
         >
       </div>
       <div class="flex items-center gap-5 text-[13px] text-muted">
+        <ImageSources />
         <span>約 1–2 分鐘 · 自己試試看</span
         ><button
           v-if="active"
@@ -179,14 +188,14 @@ onBeforeUnmount(() => clearTimeout(revealTimer));
         v-else-if="phase === 'results'"
         :item="item"
         :mode="mode"
-        :data="data[mode]"
+        :data="result"
         :ed="ed"
         :es="es"
         :selected="selected"
         :points="points"
         :metric="metric"
         @edit="edit(mode === 'function' ? 'es' : 'draw')"
-        @restart="start(mode)"
+        @restart="start(mode, item.id, metric)"
         @other="start(mode === 'function' ? 'dimension' : 'function')"
         @home="reset"
       />
@@ -250,7 +259,7 @@ onBeforeUnmount(() => clearTimeout(revealTimer));
         <TaskPlayer
           v-else
           ref="player"
-          :key="mode"
+          :key="item.id"
           :item="item"
           :initial-frame="phase === 'ed' ? ed?.frame : phase === 'es' ? es?.frame : selected?.frame"
           :drawing="phase === 'draw'"
@@ -263,7 +272,7 @@ onBeforeUnmount(() => clearTimeout(revealTimer));
           <div class="mb-5 flex justify-between text-[13px] text-brand">
             <span
               >{{ mode === "function" ? "泵血功能" : "心臟尺寸" }} · 示範病例
-              {{ mode === "function" ? "01" : "02" }}</span
+              {{ item.caseTitle.replace(/^.*案例\s*/, "") }}</span
             ><span>步驟 {{ step }} / 3</span>
           </div>
           <h1 class="text-[35px] font-semibold leading-[1.35] tracking-tight">{{ title }}</h1>

@@ -2,6 +2,8 @@
 
 繁體中文、Vue 3 + TypeScript + Vite + Tailwind CSS 4 的純靜態演示台，使用 pnpm 管理依賴。兩類預置影片由同一 model25 checkpoint 的逐病例結果驅動：泵血功能與心臟尺寸。瀏覽器不執行模型推理，亦不接收任意影片上傳。
 
+展台現有六個病例、七項指標輪播；EDV／ESV 入口已換成較高解析度的 EchoXFlow 影片。每項先播放完整影片，再顯示定位畫面與實際輪廓／量測線。點「開始體驗」即固定使用當時病例。來源、逐項配置與核對方式見 [病例庫說明](docs/case-library.md)。
+
 ## 本地啟動
 
 預設 `#/` 為新展台互動體驗；以下六入口展示的說明對應保留的 `#/showcase`。原有病例詳情連結繼續有效。展台操作、資料來源與連續運行驗收詳見 [展台操作說明](docs/booth-operation.md)。
@@ -29,7 +31,11 @@ pnpm preview
 
 開啟 [本地靜態版](http://127.0.0.1:4173/)。`dist/` 是可由任何本地靜態 HTTP 伺服器提供的完整構建；請勿直接以 `file://` 開啟。執行 `pnpm build` 不會部署到 GitHub。
 
+STG 展台已部署到 [158.132.74.7:8080](http://158.132.74.7:8080/)，使用 Caddy 與 Firefox 全屏展示。更新路徑、服務管理及實屏驗證見 [STG 部署說明](docs/stg-deployment.md)。
+
 保持靜態預覽運行，在另一個終端執行 `pnpm check:browser`，會以已安裝的 Google Chrome 檢查六個指標入口、自動影片播放與選幀、指標直達連結、輪廓／端點顯示、鍵盤、減少動效及單屏排版，並保存本地截圖。
+
+`pnpm check:library` 另檢查七項待機輪播、所有病例進入互動後的固定與對照，以及逐頁截圖；`pnpm check:experience` 包含 100 次互動／復位檢查。
 
 ## Tailwind 樣式
 
@@ -43,7 +49,8 @@ pnpm preview
 
 1. 在論文目錄使用既有 `.scripts/ct-heart-remote/pull`，將所選 LVH 原始影片拉到本網站 `private-source/`；不直接使用 SSH。
 1. 保留项目中已有的 model25 `predictions.csv` 與 Dynamic 影片。
-1. 將 TED `patient025` 的完整本次匯出放入 `private-source/ted-case/`；解析度、時間與功能輸出驗證範圍見 [TED 病例說明](docs/ted-case.md)。
+1. 將 TED `patient072` 的完整本次匯出放入 `private-source/ted-case/`；解析度、時間與功能輸出驗證範圍見 [TED 病例說明](docs/ted-case.md)。
+1. 將已選 EchoXFlow 和 LVH 本次匯出置於 `private-source/echoxflow-screening/`，目錄對照見 [病例庫說明](docs/case-library.md)。
 1. 在本網站執行 `pnpm prepare:demo`，轉換 MP4、生成封面、影片縮圖及六個病例資料。
 1. 執行 `pnpm prepare:experience`，同步展台中的病例資料和實際證據幀。
 

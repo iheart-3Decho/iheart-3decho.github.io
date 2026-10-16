@@ -1,0 +1,12 @@
+{
+	admin off
+	auto_https off
+}
+
+http://:8080 {
+	root * /home/smarthealth/demos/crf-demo/lyh/site
+	encode zstd gzip
+	@entry path / /index.html /demo/*.json /experience/*.json
+	header @entry Cache-Control "no-cache"
+	file_server
+}
