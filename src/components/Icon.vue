@@ -16,6 +16,9 @@ const paths: Record<string, string> = {
   layers: "m12 3 10 5-10 5L2 8ZM2 12l10 5 10-5M2 16l10 5 10-5",
   reload: "M3 10a9 9 0 1 1 1 8M3 4v6h6",
   chart: "M4 4v16h16M8 14l4-6 4 3 4-6",
+  report: "M14 3H5v18h14V8ZM14 3v5h5M8 12h8M8 16h6",
+  print: "M6 9V3h12v6M6 18H3V9h18v9h-3M6 14h12v7H6ZM17 12h.01",
+  folder: "M3 6h7l2 3h9v12H3ZM3 6V3h7l2 3h9v3",
 };
 </script>
 <template>

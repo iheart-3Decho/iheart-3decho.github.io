@@ -27,7 +27,7 @@ function save() {
 }
 let started;
 try {
-  await page.goto(process.env.DEMO_URL || "http://127.0.0.1:4173/");
+  await page.goto(new URL("#/experience", process.env.DEMO_URL || "http://127.0.0.1:4173/").href);
   await page.locator("[data-attract]").waitFor();
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Performance.enable");

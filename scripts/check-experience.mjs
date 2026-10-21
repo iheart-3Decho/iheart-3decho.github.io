@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-const origin = process.env.DEMO_URL || "http://127.0.0.1:4173/";
+const origin = new URL("#/experience", process.env.DEMO_URL || "http://127.0.0.1:4173/").href;
 const output = resolve(process.env.VALIDATION_DIR || "private-source/booth-validation");
 mkdirSync(output, { recursive: true });
 const browser = await chromium.launch({ channel: "chrome", headless: true });

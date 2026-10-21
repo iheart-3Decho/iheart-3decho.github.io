@@ -3,13 +3,15 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import HomePage from "./components/HomePage.vue";
 import CaseDetail from "./components/CaseDetail.vue";
 import BoothPage from "./components/experience/BoothPage.vue";
+import ClinicalWorkspace from "./components/clinical/ClinicalWorkspace.vue";
 import type { ExperienceData } from "./experience/types";
 import type { DemoCase } from "./types";
 
 const cases = ref<DemoCase[]>([]);
 const experience = ref<ExperienceData>();
 const experienceFailed = ref(false);
-const isBooth = computed(() => route.value === "#/" || route.value === "#/experience");
+const isBooth = computed(() => route.value === "#/experience");
+const isClinical = computed(() => route.value === "#/" || route.value === "#/clinical");
 const failed = ref(false),
   loaded = ref(false);
 const route = ref(window.location.hash || "#/");
@@ -83,14 +85,25 @@ onBeforeUnmount(() => window.removeEventListener("hashchange", syncRoute));
 </script>
 
 <template>
-  <BoothPage v-if="isBooth && experience && cases.length" :cases="cases" :data="experience" />
+  <ClinicalWorkspace
+    v-if="isClinical && experience && cases.length"
+    :cases="cases"
+    :data="experience"
+  />
+  <BoothPage v-else-if="isBooth && experience && cases.length" :cases="cases" :data="experience" />
   <main
-    v-else-if="isBooth"
+    v-else-if="isBooth || isClinical"
     class="grid h-dvh place-content-center gap-5 bg-canvas text-center text-ink"
     role="status"
   >
     <h1 class="text-[25px]">
-      {{ failed || experienceFailed ? "示範素材未能載入" : "正在準備互動體驗…" }}
+      {{
+        failed || experienceFailed
+          ? "示範素材未能載入"
+          : isClinical
+            ? "正在載入心超工作站…"
+            : "正在準備互動體驗…"
+      }}
     </h1>
     <button
       v-if="failed || experienceFailed"

@@ -149,3 +149,16 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@media print {
+  html,
+  body,
+  #app {
+    @apply bg-white bg-none;
+  }
+  *,
+  *::before,
+  *::after {
+    @apply transition-none animate-none;
+  }
+}

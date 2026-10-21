@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright";
 
-const origin = process.env.DEMO_URL || "http://127.0.0.1:4173/";
+const origin = new URL("#/experience", process.env.DEMO_URL || "http://127.0.0.1:4173/").href;
 const output = resolve("private-source/case-library-validation");
 mkdirSync(output, { recursive: true });
 const data = JSON.parse(readFileSync("public/experience/experience.json"));
