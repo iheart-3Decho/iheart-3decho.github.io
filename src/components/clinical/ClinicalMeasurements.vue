@@ -41,7 +41,7 @@ defineEmits<{ select: [id: string]; analyse: []; confirm: []; report: [] }>();
       </thead>
       <tbody>
         <tr
-          v-for="row in item.metrics"
+          v-for="(row, index) in item.metrics"
           :key="row.id"
           class="h-[70px] border-b border-line/80"
           :class="analysed && row.id === metric.id ? 'bg-brand/[.065]' : ''"
@@ -64,8 +64,10 @@ defineEmits<{ select: [id: string]; analyse: []; confirm: []; report: [] }>();
           </td>
           <td class="text-right">
             <strong
-              class="font-mono text-[22px] font-semibold tracking-tight"
-              :class="analysed ? 'text-ink' : 'text-muted/40'"
+              :key="`${item.id}-${analysed}`"
+              class="inline-block font-mono text-[22px] font-semibold tracking-tight"
+              :class="analysed ? 'text-ink motion-safe:animate-evidence-in' : 'text-muted/40'"
+              :style="{ animationDelay: `${100 + index * 90}ms` }"
               :data-clinical-value="row.id"
               >{{ analysed ? row.value.toFixed(1) : "—" }}</strong
             ><span class="ml-1 text-[10px] text-muted">{{ row.unit }}</span>
@@ -76,7 +78,10 @@ defineEmits<{ select: [id: string]; analyse: []; confirm: []; report: [] }>();
         </tr>
       </tbody>
     </table>
-    <div v-if="analysed" class="flex min-h-0 flex-1 flex-col px-5 pb-4 pt-5">
+    <div
+      v-if="analysed"
+      class="flex min-h-0 flex-1 flex-col px-5 pb-4 pt-5 motion-safe:animate-evidence-in"
+    >
       <div class="flex items-end justify-between">
         <div>
           <p class="text-[10px] font-medium uppercase tracking-[.12em] text-brand">

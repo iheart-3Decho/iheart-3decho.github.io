@@ -16,6 +16,7 @@
     "check:experience": "node scripts/check-experience.mjs",
     "check:library": "node scripts/check-case-library.mjs",
     "check:clinical": "node scripts/check-clinical.mjs",
+    "check:clinical-motion": "node scripts/check-clinical-motion.mjs",
     "check:soak": "node scripts/soak-experience.mjs"
   },
   "dependencies": {

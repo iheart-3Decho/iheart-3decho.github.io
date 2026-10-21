@@ -8,6 +8,7 @@ import ClinicalPlayer from "./ClinicalPlayer.vue";
 import ClinicalEvidence from "./ClinicalEvidence.vue";
 import ClinicalMeasurements from "./ClinicalMeasurements.vue";
 import ClinicalReport from "./ClinicalReport.vue";
+import ClinicalWorkflow from "./ClinicalWorkflow.vue";
 import ImageSources from "../ImageSources.vue";
 import Icon from "../Icon.vue";
 const props = defineProps<{ cases: DemoCase[]; data: ExperienceData }>();
@@ -18,7 +19,6 @@ const {
   overlay,
   reportOpen,
   frame,
-  elapsed,
   playlistIndex,
   reviews,
   item,
@@ -37,6 +37,7 @@ const exam = computed(() =>
   examNumber(props.cases.findIndex((entry) => entry.id === caseId.value)),
 );
 const reviewed = computed(() => Object.values(reviews).filter((entry) => entry.analysed).length);
+const stage = computed(() => (reportOpen.value ? 2 : review.value.analysed ? 1 : 0));
 function onInteraction(event: Event) {
   if (event.target instanceof Element && event.target.closest("[data-clinical-auto]")) return;
   interact();
@@ -103,7 +104,8 @@ function onInteraction(event: Event) {
         </div>
       </header>
       <div
-        class="grid min-h-0 gap-4 p-4 print:block print:p-0"
+        class="grid min-h-0 gap-4 p-4 motion-safe:transition-[grid-template-columns] motion-safe:duration-700 motion-safe:ease-[cubic-bezier(.22,1,.36,1)] print:block print:p-0"
+        data-clinical-layout
         :class="
           reportOpen
             ? 'grid-cols-[240px_minmax(0,1fr)_520px]'
@@ -193,21 +195,32 @@ function onInteraction(event: Event) {
           </div>
         </aside>
         <section class="flex min-h-0 flex-col gap-3 print:hidden" aria-label="影像工作區">
-          <div class="flex h-[46px] shrink-0 items-center justify-between px-1">
-            <div class="flex items-baseline gap-3">
-              <h2 class="text-[18px] font-semibold">
-                {{ item.kind === "function" ? "左心室功能分析" : "左心室結構分析" }}
-              </h2>
-              <span class="text-[11px] text-muted">{{ exam }} · {{ item.view }}</span>
+          <div class="shrink-0 space-y-2">
+            <div class="flex h-[34px] items-center justify-between px-1">
+              <div class="flex items-baseline gap-3">
+                <h2 class="text-[18px] font-semibold">
+                  {{ item.kind === "function" ? "左心室功能分析" : "左心室結構分析" }}
+                </h2>
+                <span class="text-[11px] text-muted">{{ exam }} · {{ item.view }}</span>
+              </div>
+              <span
+                class="rounded-full border border-line bg-white px-3 py-1.5 text-[10px] text-muted"
+                >{{
+                  automatic
+                    ? `自動演示 ${playlistIndex + 1} / ${data.playlist.length}`
+                    : "手動閱片"
+                }}<span class="ml-2 text-brand">{{
+                  automatic
+                    ? stage === 2
+                      ? "量測報告"
+                      : stage === 1
+                        ? "量測定位"
+                        : "影片回放"
+                    : "可自由核查"
+                }}</span></span
+              >
             </div>
-            <span
-              class="rounded-full border border-line bg-white px-3 py-1.5 text-[10px] text-muted"
-              >{{
-                automatic ? `自動演示 ${playlistIndex + 1} / ${data.playlist.length}` : "手動閱片"
-              }}<span class="ml-2 text-brand">{{
-                automatic ? (elapsed < 5 ? "影片回放" : "量測定位") : "可自由核查"
-              }}</span></span
-            >
+            <ClinicalWorkflow :stage="stage" :metric="metric.code" :kind="item.kind" />
           </div>
           <ClinicalPlayer
             :key="item.id"
@@ -216,7 +229,7 @@ function onInteraction(event: Event) {
             :analysed="review.analysed"
             :overlay="overlay"
             :command="command"
-            class="flex-1"
+            class="flex-1 motion-safe:animate-workspace-in"
             @frame="frame = $event"
             @overlay="overlay = $event"
             @metric="selectMetric"
@@ -232,27 +245,41 @@ function onInteraction(event: Event) {
             @seek="issue('seek', $event)"
           />
         </section>
-        <ClinicalReport
-          v-if="reportOpen"
-          :item="item"
-          :experience="experience"
-          :exam="exam"
-          :confirmed="review.confirmed"
-          @close="reportOpen = false"
-          @metric="selectMetric"
-        />
-        <ClinicalMeasurements
-          v-else
-          class="print:hidden"
-          :item="item"
-          :metric="metric"
-          :analysed="review.analysed"
-          :confirmed="review.confirmed"
-          @select="selectMetric"
-          @analyse="analyse"
-          @confirm="review.confirmed = !review.confirmed"
-          @report="reportOpen = true"
-        />
+        <div class="flex min-h-0 flex-col print:contents" data-clinical-result-slot>
+          <Transition
+            mode="out-in"
+            enter-active-class="motion-safe:transition-[opacity,translate] motion-safe:duration-500 motion-safe:ease-out"
+            enter-from-class="motion-safe:translate-x-4 motion-safe:opacity-0"
+            enter-to-class="translate-x-0 opacity-100"
+            leave-active-class="motion-safe:transition-[opacity,translate] motion-safe:duration-150 motion-safe:ease-in"
+            leave-to-class="motion-safe:-translate-x-2 motion-safe:opacity-0"
+          >
+            <ClinicalReport
+              v-if="reportOpen"
+              key="report"
+              class="flex-1"
+              :item="item"
+              :experience="experience"
+              :exam="exam"
+              :confirmed="review.confirmed"
+              @close="reportOpen = false"
+              @metric="selectMetric"
+            />
+            <ClinicalMeasurements
+              v-else
+              key="measurements"
+              class="flex-1 print:hidden"
+              :item="item"
+              :metric="metric"
+              :analysed="review.analysed"
+              :confirmed="review.confirmed"
+              @select="selectMetric"
+              @analyse="analyse"
+              @confirm="review.confirmed = !review.confirmed"
+              @report="reportOpen = true"
+            />
+          </Transition>
+        </div>
       </div>
       <footer
         class="flex items-center justify-between border-t border-line bg-white px-6 text-[10px] text-muted print:hidden"

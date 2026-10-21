@@ -50,7 +50,7 @@ const curve = computed(() => series.value.map((p) => `${x(p.frame)},${y(p.value)
     </header>
     <div
       v-if="analysed"
-      class="grid min-h-0 flex-1 gap-4 p-3"
+      class="grid min-h-0 flex-1 gap-4 p-3 motion-safe:animate-evidence-in"
       :class="item.kind === 'function' ? 'grid-cols-[1fr_1.1fr]' : 'grid-cols-1'"
     >
       <div
@@ -107,7 +107,15 @@ const curve = computed(() => series.value.map((p) => `${x(p.frame)},${y(p.value)
               {{ value }}
             </text>
           </g>
-          <polyline :points="curve" fill="none" stroke="#147e7d" stroke-width="2" />
+          <polyline
+            :points="curve"
+            fill="none"
+            stroke="#147e7d"
+            stroke-width="2"
+            pathLength="1"
+            stroke-dasharray="1"
+            class="motion-safe:animate-curve-in"
+          />
           <g v-for="phase in ['ed', 'es'] as const" :key="phase">
             <line
               :x1="x(item.phases[phase].frame)"

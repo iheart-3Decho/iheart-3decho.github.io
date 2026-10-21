@@ -186,8 +186,9 @@ onBeforeUnmount(() => {
       />
       <svg
         v-if="visible"
+        :key="metric.id"
         :viewBox="`0 0 ${item.width} ${item.height}`"
-        class="pointer-events-none absolute inset-0 h-full w-full"
+        class="pointer-events-none absolute inset-0 h-full w-full motion-safe:animate-measure-focus"
         aria-label="AI 證據幀量測位置"
         data-clinical-overlay
       >

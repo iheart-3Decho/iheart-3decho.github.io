@@ -13,7 +13,22 @@ const page = await context.newPage();
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 const root = page.locator("[data-clinical]");
+// Advance past the staged leave/enter and evidence effects with the controlled
+// clock. Native-time checks separately inspect intermediate animated states.
+async function settleMotion() {
+  await page.clock.runFor(950);
+  // Playwright's controlled JS clock does not advance Chrome's CSS timeline.
+  // Finish finite visual effects for final-state assertions; the separate
+  // native-time motion test verifies their real duration and intermediate state.
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) {
+      if (Number.isFinite(animation.effect?.getComputedTiming().endTime)) animation.finish();
+    }
+  });
+  await page.clock.runFor(50);
+}
 async function fit(name) {
+  await settleMotion();
   const overflow = await page.evaluate(() => {
     const issues = [];
     if (
@@ -25,11 +40,19 @@ async function fit(name) {
       '[data-clinical-measurements], [data-clinical-report-panel], [data-clinical-report-document], [data-clinical-evidence], aside[aria-label="檢查列表"]',
     ))
       if (el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2)
-        issues.push(el.getAttribute("aria-label") || el.tagName);
+        issues.push({
+          element: el.getAttribute("aria-label") || el.tagName,
+          size: [el.clientWidth, el.clientHeight, el.scrollWidth, el.scrollHeight],
+          animations: el.getAnimations({ subtree: true }).map((a) => ({
+            name: a.animationName || a.transitionProperty,
+            state: a.playState,
+            time: a.currentTime,
+          })),
+        });
     return issues;
   });
+  await page.screenshot({ path: resolve(output, `${name}.png`), animations: "disabled" });
   assert.deepEqual(overflow, [], name);
-  await page.screenshot({ path: resolve(output, `${name}.png`) });
 }
 async function loaded() {
   await page.waitForFunction(
@@ -69,6 +92,10 @@ try {
   const clockStart = new Date();
   await page.clock.install({ time: clockStart });
   await page.clock.pauseAt(clockStart);
+  async function advanceTo(milliseconds) {
+    const current = await page.evaluate(() => Date.now());
+    await page.clock.runFor(Math.max(0, clockStart.getTime() + milliseconds - current));
+  }
   await page.goto(origin);
   await root.waitFor();
   await loaded();
@@ -82,20 +109,22 @@ try {
     assert.equal(await root.getAttribute("data-metric"), preview.metric);
     await loaded();
     assert.equal(await page.locator("[data-clinical-overlay]").count(), 0);
-    await page.clock.runFor(5000);
+    await advanceTo(index * 12000 + 5000);
     await selected(
       item,
       item.metrics.find((m) => m.id === preview.metric),
     );
     await fit(`02-auto-${index}-${preview.metric}`);
-    await page.clock.runFor(3000);
+    await advanceTo(index * 12000 + 8000);
+    await settleMotion();
     await page.locator("[data-clinical-report-panel]").waitFor();
     assert.equal(await page.getByRole("dialog").count(), 0);
     await page
       .locator("[data-clinical-report-panel] img")
       .evaluateAll((images) => Promise.all(images.map((img) => img.decode())));
     await fit(`02-auto-report-${index}`);
-    await page.clock.runFor(4000);
+    await advanceTo((index + 1) * 12000);
+    await settleMotion();
   }
   assert.equal(await root.getAttribute("data-case"), data.playlist[0].caseId);
   // Reset states with resume, then take control before analysing any case.
@@ -103,9 +132,11 @@ try {
   assert.equal(await root.getAttribute("data-automatic"), "false");
   await page.locator("[data-clinical-auto]").click();
   await page.locator("[data-clinical-auto]").click();
+  await settleMotion();
   const tested = [];
   for (const [index, item] of cases.entries()) {
     await page.locator(`[data-clinical-case="${item.id}"]`).click();
+    await settleMotion();
     await loaded();
     assert.equal(await root.getAttribute("data-automatic"), "false");
     assert.equal(await root.getAttribute("data-analysed"), "false");
@@ -113,6 +144,7 @@ try {
       (await page.locator("[data-clinical-value]").allTextContents()).every((s) => s === "—"),
     );
     await page.locator("[data-clinical-analyse]").click();
+    await settleMotion();
     for (const metric of item.metrics) {
       assert.equal(
         await page.locator(`[data-clinical-value="${metric.id}"]`).innerText(),
@@ -169,6 +201,7 @@ try {
       (metric.evidence.frame + 2) % item.frameCount,
     );
     await page.locator("[data-clinical-generate]").click();
+    await settleMotion();
     const report = page.locator("[data-clinical-report-panel]");
     await report.waitFor();
     // Vue ignores a bubbled event with the same timestamp as a newly attached
@@ -176,9 +209,11 @@ try {
     await page.clock.runFor(1);
     assert.ok((await report.innerText()).includes("待核查"));
     await page.locator("[data-clinical-return-measurements]").click();
+    await settleMotion();
     await report.waitFor({ state: "detached" });
     await page.locator("[data-clinical-confirm]").click();
     await page.locator("[data-clinical-report]").click();
+    await settleMotion();
     await report.waitFor();
     await page.clock.runFor(1);
     await report
@@ -218,11 +253,13 @@ try {
     assert.equal(await page.locator("[data-clinical-player]").isVisible(), true);
     assert.equal(await page.getByRole("dialog").count(), 0);
     await page.locator("[data-clinical-return-measurements]").click();
+    await settleMotion();
     tested.push(item.id);
   }
   // Idle clears the report and review state, returning to the first carousel item.
   await page.locator("[data-clinical-generate]").click();
   await page.clock.runFor(121000);
+  await settleMotion();
   assert.equal(await page.locator("[data-clinical-report-panel]").count(), 0);
   assert.equal(await root.getAttribute("data-automatic"), "true");
   assert.equal(await page.locator('[data-clinical-confirm][aria-pressed="true"]').count(), 0);
@@ -267,13 +304,16 @@ try {
     for (let i = 0; i < count; i++) {
       const item = cases[i % cases.length];
       await page.locator(`[data-clinical-case="${item.id}"]`).click();
+      await settleMotion();
       await loaded();
       await page.locator("[data-clinical-analyse]").click();
       await page.locator("[data-clinical-generate]").click();
+      await settleMotion();
       const report = page.locator("[data-clinical-report-panel]");
       await report.waitFor();
       await page.clock.runFor(1);
       await page.locator("[data-clinical-return-measurements]").click();
+      await settleMotion();
       await report.waitFor({ state: "detached" });
       assert.equal(await page.locator("video").count(), 1);
     }
