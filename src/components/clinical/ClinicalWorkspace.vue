@@ -54,8 +54,10 @@ function onInteraction(event: Event) {
     @keydown.capture="onInteraction"
     @wheel.passive="interact"
   >
-    <div class="grid h-full grid-rows-[68px_minmax(0,1fr)_30px] print:hidden" :inert="reportOpen">
-      <header class="flex items-center justify-between border-b border-line bg-white px-6">
+    <div class="grid h-full grid-rows-[68px_minmax(0,1fr)_30px] print:block print:h-auto">
+      <header
+        class="flex items-center justify-between border-b border-line bg-white px-6 print:hidden"
+      >
         <div class="flex items-center gap-3">
           <span class="grid size-9 place-items-center rounded-xl bg-brand text-white"
             ><Icon name="heart" :size="23" /></span
@@ -80,7 +82,9 @@ function onInteraction(event: Event) {
             data-clinical-generate
             @click="reportOpen = true"
           >
-            <Icon name="report" :size="16" />生成報告</button
+            <Icon :name="reportOpen ? 'check' : 'report'" :size="16" />{{
+              reportOpen ? "報告已生成" : "生成報告"
+            }}</button
           ><span class="mx-1 h-6 border-l border-line" /><button
             class="flex items-center gap-2 rounded-lg border px-3 py-2.5"
             :class="automatic ? 'border-brand/20 bg-brand/5 text-brand' : 'border-line text-muted'"
@@ -98,9 +102,16 @@ function onInteraction(event: Event) {
           /></a>
         </div>
       </header>
-      <div class="grid min-h-0 grid-cols-[240px_minmax(0,1fr)_400px] gap-4 p-4">
+      <div
+        class="grid min-h-0 gap-4 p-4 print:block print:p-0"
+        :class="
+          reportOpen
+            ? 'grid-cols-[240px_minmax(0,1fr)_520px]'
+            : 'grid-cols-[240px_minmax(0,1fr)_400px]'
+        "
+      >
         <aside
-          class="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white"
+          class="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white print:hidden"
           aria-label="檢查列表"
         >
           <div class="flex h-14 shrink-0 items-center justify-between border-b border-line px-4">
@@ -181,7 +192,7 @@ function onInteraction(event: Event) {
             </div>
           </div>
         </aside>
-        <section class="flex min-h-0 flex-col gap-3" aria-label="影像工作區">
+        <section class="flex min-h-0 flex-col gap-3 print:hidden" aria-label="影像工作區">
           <div class="flex h-[46px] shrink-0 items-center justify-between px-1">
             <div class="flex items-baseline gap-3">
               <h2 class="text-[18px] font-semibold">
@@ -221,7 +232,18 @@ function onInteraction(event: Event) {
             @seek="issue('seek', $event)"
           />
         </section>
+        <ClinicalReport
+          v-if="reportOpen"
+          :item="item"
+          :experience="experience"
+          :exam="exam"
+          :confirmed="review.confirmed"
+          @close="reportOpen = false"
+          @metric="selectMetric"
+        />
         <ClinicalMeasurements
+          v-else
+          class="print:hidden"
           :item="item"
           :metric="metric"
           :analysed="review.analysed"
@@ -233,7 +255,7 @@ function onInteraction(event: Event) {
         />
       </div>
       <footer
-        class="flex items-center justify-between border-t border-line bg-white px-6 text-[10px] text-muted"
+        class="flex items-center justify-between border-t border-line bg-white px-6 text-[10px] text-muted print:hidden"
       >
         <div class="flex items-center gap-4">
           <span class="flex items-center gap-1.5"
@@ -249,13 +271,5 @@ function onInteraction(event: Event) {
         </div>
       </footer>
     </div>
-    <ClinicalReport
-      v-if="reportOpen"
-      :item="item"
-      :experience="experience"
-      :exam="exam"
-      :confirmed="review.confirmed"
-      @close="reportOpen = false"
-    />
   </main>
 </template>

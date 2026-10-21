@@ -22,7 +22,7 @@ async function fit(name) {
     )
       issues.push("document");
     for (const el of document.querySelectorAll(
-      '[data-clinical-measurements], [data-clinical-report-dialog], [data-clinical-evidence], aside[aria-label="檢查列表"]',
+      '[data-clinical-measurements], [data-clinical-report-panel], [data-clinical-report-document], [data-clinical-evidence], aside[aria-label="檢查列表"]',
     ))
       if (el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2)
         issues.push(el.getAttribute("aria-label") || el.tagName);
@@ -88,7 +88,14 @@ try {
       item.metrics.find((m) => m.id === preview.metric),
     );
     await fit(`02-auto-${index}-${preview.metric}`);
-    await page.clock.runFor(7000);
+    await page.clock.runFor(3000);
+    await page.locator("[data-clinical-report-panel]").waitFor();
+    assert.equal(await page.getByRole("dialog").count(), 0);
+    await page
+      .locator("[data-clinical-report-panel] img")
+      .evaluateAll((images) => Promise.all(images.map((img) => img.decode())));
+    await fit(`02-auto-report-${index}`);
+    await page.clock.runFor(4000);
   }
   assert.equal(await root.getAttribute("data-case"), data.playlist[0].caseId);
   // Reset states with resume, then take control before analysing any case.
@@ -162,13 +169,13 @@ try {
       (metric.evidence.frame + 2) % item.frameCount,
     );
     await page.locator("[data-clinical-generate]").click();
-    const report = page.locator("[data-clinical-report-dialog]");
+    const report = page.locator("[data-clinical-report-panel]");
     await report.waitFor();
     // Vue ignores a bubbled event with the same timestamp as a newly attached
-    // listener. Advance the paused test clock to model a subsequent keystroke.
+    // listener. Advance the paused test clock to model a subsequent action.
     await page.clock.runFor(1);
     assert.ok((await report.innerText()).includes("待核查"));
-    await page.keyboard.press("Escape");
+    await page.locator("[data-clinical-return-measurements]").click();
     await report.waitFor({ state: "detached" });
     await page.locator("[data-clinical-confirm]").click();
     await page.locator("[data-clinical-report]").click();
@@ -192,15 +199,31 @@ try {
         margin: { top: "12mm", bottom: "12mm", left: "12mm", right: "12mm" },
       });
     }
-    await page.keyboard.press("Tab");
-    assert.equal(await report.evaluate((el) => el.contains(document.activeElement)), true);
-    await page.keyboard.press("Escape");
+    // The report shares the workspace: its evidence links control the still
+    // visible player without closing the report or requiring another preview.
+    const targetMetric = item.metrics.find(
+      (m) => m.id === (item.kind === "function" ? "esv" : "lvids"),
+    );
+    await report
+      .getByRole("button", {
+        name:
+          item.kind === "function"
+            ? "回看收縮末期 · ES"
+            : `回看${targetMetric.label} · ${targetMetric.code}`,
+        exact: true,
+      })
+      .click();
+    await selected(item, targetMetric);
+    assert.equal(await report.isVisible(), true);
+    assert.equal(await page.locator("[data-clinical-player]").isVisible(), true);
+    assert.equal(await page.getByRole("dialog").count(), 0);
+    await page.locator("[data-clinical-return-measurements]").click();
     tested.push(item.id);
   }
   // Idle clears the report and review state, returning to the first carousel item.
   await page.locator("[data-clinical-generate]").click();
   await page.clock.runFor(121000);
-  assert.equal(await page.locator("[data-clinical-report-dialog]").count(), 0);
+  assert.equal(await page.locator("[data-clinical-report-panel]").count(), 0);
   assert.equal(await root.getAttribute("data-automatic"), "true");
   assert.equal(await page.locator('[data-clinical-confirm][aria-pressed="true"]').count(), 0);
   await page.locator("[data-clinical-analyse]").focus();
@@ -247,10 +270,10 @@ try {
       await loaded();
       await page.locator("[data-clinical-analyse]").click();
       await page.locator("[data-clinical-generate]").click();
-      const report = page.locator("[data-clinical-report-dialog]");
+      const report = page.locator("[data-clinical-report-panel]");
       await report.waitFor();
       await page.clock.runFor(1);
-      await page.keyboard.press("Escape");
+      await page.locator("[data-clinical-return-measurements]").click();
       await report.waitFor({ state: "detached" });
       assert.equal(await page.locator("video").count(), 1);
     }

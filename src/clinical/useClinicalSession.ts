@@ -98,6 +98,7 @@ export function useClinicalSession(cases: DemoCase[], data: ExperienceData) {
       if (automatic.value) {
         elapsed.value++;
         if (elapsed.value === 5) analyse();
+        if (elapsed.value === 8) reportOpen.value = true;
         if (elapsed.value >= 12) showPreview((playlistIndex.value + 1) % data.playlist.length);
       } else if (!reduced.matches && Date.now() - lastActivity >= 120000) resume();
     }, 1000);
