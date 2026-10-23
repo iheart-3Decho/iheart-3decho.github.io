@@ -44,9 +44,6 @@ function motionChange() {
 function focusProjects() {
   document.getElementById("exhibition-projects")?.focus();
 }
-function seekHeroPastIntro() {
-  if (hero.value && hero.value.currentTime < 0.1) hero.value.currentTime = 2;
-}
 onMounted(() => {
   document.title = "iHeart — 心臟超聲 · 三維視覺化與智能分析";
   reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -161,7 +158,6 @@ onBeforeUnmount(() => {
               playsinline
               preload="metadata"
               class="h-full w-full object-contain"
-              @loadedmetadata="seekHeroPastIntro"
               @play="playing = true"
               @pause="playing = false"
               @error="failed = true"

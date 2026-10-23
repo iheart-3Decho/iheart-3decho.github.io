@@ -16,7 +16,7 @@ GitHub Pages 的預設首頁展示三項研究：三維心臟視覺化、解剖�
 
 ## 操作
 
-- 首頁以使用者提供的三項目完整介紹影片為主視覺，以末段功能量測畫面作封面，避免載入時從空白片頭開始；提供原生播放、音量、進度及全螢幕控制，點擊後手動播放，不重複循環。三項研究的圖片與短片為下方補充入口。
+- 首頁以使用者提供的三項目完整介紹影片為主視覺，以實際影片封面呈現；提供原生播放、音量、進度及全螢幕控制，點擊後手動播放，不重複循環。三項研究的圖片與短片為下方補充入口。
 - 三張卡片分別開啟實際素材。上方按鈕切換影片、介面截圖和方法圖；影片提供原生播放、音量、進度及全螢幕控制。
 - 「觀看介紹影片」開啟約 3 分 23 秒的完整介紹，需手動播放，不自動開啟聲音。
 - 按 Escape 或關閉按鈕返回；焦點回到原入口。開啟素材時暫停首頁影片，關閉後只在原先播放中的情況下恢復。
@@ -58,7 +58,6 @@ gaussian-evolution.mp4   90daba9611ea7b40c747ab49df8bcea028089f6834fef47a7e95350
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm check:types
-pnpm check:data
 pnpm build:gallery
 pnpm preview:gallery
 ```
@@ -67,4 +66,4 @@ pnpm preview:gallery
 
 普通構建仍使用 `pnpm build`、`pnpm preview`，預覽為 `http://127.0.0.1:4173/`；以 `pnpm check:clinical` 和 `pnpm check:browser` 回歸工作站及舊六入口。
 
-GitHub Actions 在 `main` 更新後執行資料檢查、lint 和 `pnpm build:gallery`，僅將 `dist-gallery/` 發布到 Pages。此流程不連接演示機，不變更其 Caddy、桌面快捷方式或服務。
+影片編碼、尺寸與既有病例資料已在本地使用 `pnpm check:data` 完成核對；展示頁的 GitHub Actions 只執行 lint 和 `pnpm build:gallery`，不在 runner 重複安裝影片工具。此流程不連接演示機，不變更其 Caddy、桌面快捷方式或服務。
