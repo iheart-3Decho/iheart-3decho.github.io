@@ -1,12 +1,14 @@
 # iHeart 心臟超聲分析工作站
 
+GitHub Pages 現以三項研究演示為展示首頁：三維心臟視覺化、解剖引導瓣膜分割及心超影片量測。展示頁使用郵件提供的實際圖片與影片；原臨床工作站、互動展台和六個病例詳情仍保留。素材來源、兩種構建模式及操作見 [展示網站說明](docs/exhibition-website.md)。
+
 繁體中文、Vue 3 + TypeScript + Vite + Tailwind CSS 4 的純靜態臨床工作站演示版，使用 pnpm 管理依賴。兩類預置影片由同一 model25 checkpoint 的逐病例結果驅動：泵血功能與心臟尺寸。瀏覽器不執行模型推理，亦不接收任意影片上傳。
 
 展台現有六個病例、七項指標輪播；EDV／ESV 入口已換成較高解析度的 EchoXFlow 影片。每項先播放完整影片，再顯示定位畫面與實際輪廓／量測線。點「開始體驗」即固定使用當時病例。來源、逐項配置與核對方式見 [病例庫說明](docs/case-library.md)。
 
 ## 本地啟動
 
-預設 `#/` 與 `#/clinical` 為臨床分析工作站：檢查列表、大幅閱片、量測表、關鍵幀與報告預覽。選擇病例後，點「AI 分析」再點「生成報告」即可完成示範；確認量測為可選操作。操作方式及驗收見 [工作站說明](docs/clinical-workstation.md)。2026-10-23 已更新 STG 演示機，改用桌面快捷方式手動全螢幕啟動；GitHub Pages 本輪未更新。
+普通構建的預設 `#/` 與 `#/clinical` 為臨床分析工作站：檢查列表、大幅閱片、量測表、關鍵幀與報告預覽。選擇病例後，點「AI 分析」再點「生成報告」即可完成示範；確認量測為可選操作。操作方式及驗收見 [工作站說明](docs/clinical-workstation.md)。STG 演示機保持桌面快捷方式手動全螢幕啟動，本次展示網站更新不影響演示機。
 
 工作站現在提供九例；自動演示每例 36 秒（原片 8 秒、逐項量測 20 秒、報告 8 秒），完成後才換下一例，一圈不重複。三例新增 TED 素材獨立保存於 `public/experience/clinical-additions.json`；原展台和六個詳情入口保持不變。
 
@@ -66,9 +68,9 @@ STG 展台已部署到 [158.132.74.7:8080](http://158.132.74.7:8080/)，使用 C
 
 公開演示網址：[iHeart](https://iheart-3decho.github.io/)。六個病例已獲使用者確認可公開展示。
 
-`.github/workflows/pages.yml` 在 `main` 推送後驗證病例資料、檢查 TypeScript 並構建 Vue 網站，再將 `dist/` 作為 GitHub Pages artifact 發布。也可透過 GitHub Actions 的手動執行入口重新發布。Pages 的發布來源使用 **GitHub Actions**，不直接發布倉庫根目錄。
+`.github/workflows/pages.yml` 在 `main` 推送後驗證病例資料、檢查 TypeScript 並執行 `pnpm build:gallery`，將 `dist-gallery/` 作為 GitHub Pages artifact 發布。也可透過 GitHub Actions 的手動執行入口重新發布。Pages 的發布來源使用 **GitHub Actions**，不直接發布倉庫根目錄。
 
-發布內容包括前端與 `public/demo/` 中的 MP4、縮圖及預置結果。`private-source/`、原始研究 AVI 和本地驗收截圖不進入發布 artifact。
+發布內容包括三項演示的 `public/exhibition/` 素材，以及保留頁面使用的 MP4、縮圖及預置結果。`private-source/`、原始研究 AVI 和本地驗收截圖不進入發布 artifact。用 `pnpm build:gallery`、`pnpm preview:gallery` 可在 4174 端口預覽展示網站；普通 `pnpm build` 仍以工作站為首頁。
 
 部署後可驗證公開網站：
 

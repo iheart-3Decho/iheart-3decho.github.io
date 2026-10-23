@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-gallery/
 private-source/
 public/demo-private/
 *.local

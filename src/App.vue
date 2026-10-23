@@ -4,6 +4,7 @@ import HomePage from "./components/HomePage.vue";
 import CaseDetail from "./components/CaseDetail.vue";
 import BoothPage from "./components/experience/BoothPage.vue";
 import ClinicalWorkspace from "./components/clinical/ClinicalWorkspace.vue";
+import ExhibitionHome from "./components/exhibition/ExhibitionHome.vue";
 import type { ExperienceData } from "./experience/types";
 import type { DemoCase } from "./types";
 
@@ -18,6 +19,11 @@ const clinicalData = computed(() =>
 );
 const experienceFailed = ref(false);
 const isBooth = computed(() => route.value === "#/experience");
+const isExhibition = computed(
+  () =>
+    route.value === "#/gallery" ||
+    (import.meta.env.VITE_SITE_MODE === "gallery" && route.value === "#/"),
+);
 const isClinical = computed(() => route.value === "#/" || route.value === "#/clinical");
 const failed = ref(false),
   loaded = ref(false);
@@ -108,8 +114,9 @@ onBeforeUnmount(() => window.removeEventListener("hashchange", syncRoute));
 </script>
 
 <template>
+  <ExhibitionHome v-if="isExhibition" />
   <ClinicalWorkspace
-    v-if="isClinical && clinicalData && cases.length"
+    v-else-if="isClinical && clinicalData && cases.length"
     :cases="clinicalCases"
     :data="clinicalData"
   />
