@@ -27,8 +27,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install video validation tools
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Verify video validation tools
+        run: ffmpeg -version && ffprobe -version
       - name: Validate demo assets
         run: pnpm check:data
       - name: Lint and format
