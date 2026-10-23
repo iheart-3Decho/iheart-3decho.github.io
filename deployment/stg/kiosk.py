@@ -1,4 +1,4 @@
-"""Supervise this demo's Firefox profile, including Ubuntu Snap launches."""
+"""Run this demo's Firefox once; a user closing it ends the session."""
 
 import os
 from pathlib import Path
@@ -54,11 +54,12 @@ def main():
             pid = existing_browser()
     if pid is None:
         raise RuntimeError("The iHeart kiosk profile did not start")
-    print(f"Supervising iHeart Firefox PID {pid}", flush=True)
+    print(f"Running iHeart Firefox PID {pid} (manual launch, no restart)", flush=True)
     try:
         while not stopping.wait(1):
             if not is_demo_browser(pid):
-                raise RuntimeError("The iHeart kiosk browser exited")
+                print("iHeart window closed; leaving it closed", flush=True)
+                break
     finally:
         # Snap moves Firefox into a separate scope. Stop only this exact profile.
         if is_demo_browser(pid):

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=iHeart Clinical Workstation
+Name[zh_TW]=iHeart 心臟超聲分析
+Comment=Open the iHeart clinical workstation in fullscreen; close with Alt+F4
+Comment[zh_TW]=全螢幕開啟心臟超聲分析；按 Alt+F4 關閉
+Exec=/usr/bin/systemctl --user start iheart-kiosk.service
+Icon=web-browser
+Terminal=false
+StartupNotify=false
+Categories=Science;MedicalSoftware;

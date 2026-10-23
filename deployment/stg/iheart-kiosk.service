@@ -1,5 +1,5 @@
 [Unit]
-Description=iHeart fullscreen booth browser
+Description=iHeart fullscreen workstation (manual launch only)
 Requires=iheart-caddy.service
 After=iheart-caddy.service graphical-session.target
 PartOf=graphical-session.target
@@ -11,8 +11,4 @@ Environment=XAUTHORITY=/run/user/1000/gdm/Xauthority
 Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 WorkingDirectory=%h/demos/crf-demo/lyh
 ExecStart=/usr/bin/gnome-session-inhibit --inhibit idle --reason "iHeart booth display" /usr/bin/python3 %h/demos/crf-demo/lyh/kiosk.py
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=graphical-session.target
+Restart=no
