@@ -2,11 +2,16 @@ import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright";
+import { clinicalPlaylist, CLINICAL_TIMING } from "../src/clinical/carousel.ts";
 const origin = process.env.DEMO_URL || "http://127.0.0.1:4173/";
 const output = resolve("private-source/clinical-validation");
 mkdirSync(output, { recursive: true });
-const cases = JSON.parse(readFileSync("public/demo/cases.json"));
+const extra = JSON.parse(readFileSync("public/experience/clinical-additions.json"));
+const cases = [...JSON.parse(readFileSync("public/demo/cases.json")), ...extra.cases];
 const data = JSON.parse(readFileSync("public/experience/experience.json"));
+data.library.push(...extra.library);
+const playlist = clinicalPlaylist(cases, data.function.caseId);
+assert.equal(new Set(playlist.map((item) => item.id)).size, cases.length);
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
 const page = await context.newPage();
@@ -62,19 +67,35 @@ async function loaded() {
   );
 }
 async function selected(item, metric) {
-  await page.waitForFunction(
-    ({ fps, target }) => {
-      const v = document.querySelector("[data-clinical-player] video");
-      return (
-        v?.readyState >= 2 &&
-        v.paused &&
-        !v.seeking &&
-        Math.floor(v.currentTime * fps + 0.001) === target
-      );
-    },
-    { fps: item.fps, target: metric.evidence.frame },
-    { polling: 100 },
-  );
+  try {
+    await page.waitForFunction(
+      ({ fps, target }) => {
+        const v = document.querySelector("[data-clinical-player] video");
+        return (
+          v?.readyState >= 2 &&
+          v.paused &&
+          !v.seeking &&
+          Math.floor(v.currentTime * fps + 0.001) === target
+        );
+      },
+      { fps: item.fps, target: metric.evidence.frame },
+      { polling: 100 },
+    );
+  } catch (error) {
+    console.error(
+      item.id,
+      metric.id,
+      metric.evidence.frame,
+      await page.locator("video").evaluate((v) => ({
+        time: v.currentTime,
+        duration: v.duration,
+        ready: v.readyState,
+        paused: v.paused,
+        seeking: v.seeking,
+      })),
+    );
+    throw error;
+  }
   await page.locator("[data-clinical-overlay]").waitFor();
   const exported = data.library.find((x) => x.caseId === item.id).evidence[
     item.kind === "function" ? (metric.id === "esv" ? "es" : "ed") : metric.id
@@ -103,19 +124,24 @@ try {
   assert.equal(await root.getAttribute("data-automatic"), "true");
   assert.equal(await root.getAttribute("data-analysed"), "false");
   await fit("01-workstation-original");
-  for (const [index, preview] of data.playlist.entries()) {
-    const item = cases.find((c) => c.id === preview.caseId);
-    assert.equal(await root.getAttribute("data-case"), preview.caseId);
-    assert.equal(await root.getAttribute("data-metric"), preview.metric);
+  for (const [index, item] of playlist.entries()) {
+    assert.equal(await root.getAttribute("data-case"), item.id);
+    assert.equal(await root.getAttribute("data-metric"), item.metrics[0].id);
     await loaded();
     assert.equal(await page.locator("[data-clinical-overlay]").count(), 0);
-    await advanceTo(index * 12000 + 5000);
-    await selected(
-      item,
-      item.metrics.find((m) => m.id === preview.metric),
-    );
-    await fit(`02-auto-${index}-${preview.metric}`);
-    await advanceTo(index * 12000 + 8000);
+    for (const [metricIndex, metric] of item.metrics.entries()) {
+      await advanceTo(
+        (index * CLINICAL_TIMING.next +
+          CLINICAL_TIMING.analyse +
+          metricIndex * CLINICAL_TIMING.metric) *
+          1000,
+      );
+      assert.equal(await root.getAttribute("data-case"), item.id);
+      assert.equal(await root.getAttribute("data-metric"), metric.id);
+      await selected(item, metric);
+    }
+    await fit(`02-auto-${index}-${item.id}`);
+    await advanceTo((index * CLINICAL_TIMING.next + CLINICAL_TIMING.report) * 1000);
     await settleMotion();
     await page.locator("[data-clinical-report-panel]").waitFor();
     assert.equal(await page.getByRole("dialog").count(), 0);
@@ -123,10 +149,10 @@ try {
       .locator("[data-clinical-report-panel] img")
       .evaluateAll((images) => Promise.all(images.map((img) => img.decode())));
     await fit(`02-auto-report-${index}`);
-    await advanceTo((index + 1) * 12000);
+    await advanceTo((index + 1) * CLINICAL_TIMING.next * 1000);
     await settleMotion();
   }
-  assert.equal(await root.getAttribute("data-case"), data.playlist[0].caseId);
+  assert.equal(await root.getAttribute("data-case"), playlist[0].id);
   // Reset states with resume, then take control before analysing any case.
   await page.locator("[data-clinical-auto]").click();
   assert.equal(await root.getAttribute("data-automatic"), "false");
@@ -318,7 +344,7 @@ try {
       assert.equal(await page.locator("video").count(), 1);
     }
   }
-  await repeat(6);
+  await repeat(cases.length);
   const before = await resources();
   await repeat(60);
   // Hash routing must dispose of the workstation session, including its timer.
@@ -331,7 +357,7 @@ try {
     await loaded();
     assert.equal(await root.getAttribute("data-analysed"), "false");
   }
-  await repeat(6);
+  await repeat(cases.length);
   const after = await resources();
   assert.ok(after.JSHeapUsedSize <= before.JSHeapUsedSize + 6 * 1024 * 1024);
   assert.ok(after.Nodes <= before.Nodes + 250);
@@ -345,7 +371,9 @@ try {
         status: "passed",
         at: new Date().toISOString(),
         tested,
-        carouselSegments: data.playlist.length,
+        carouselSegments: playlist.length,
+        secondsPerCase: CLINICAL_TIMING.next,
+        uniqueCasesPerCycle: true,
         carouselWrap: true,
         overlayFrameAndGeometry: true,
         idleReset: true,
@@ -361,7 +389,7 @@ try {
     ) + "\n",
   );
   console.log(
-    "PASS: clinical carousel, all six analyses and reports, exact evidence geometry, frame controls, manual takeover, idle reset, reduced motion, media retry and 1920×1080 layout.",
+    "PASS: all clinical cases and metrics, one exam per 36-second segment, exact evidence geometry, reports, manual takeover, idle reset, reduced motion, media retry and 1920×1080 layout.",
   );
 } finally {
   await browser.close();

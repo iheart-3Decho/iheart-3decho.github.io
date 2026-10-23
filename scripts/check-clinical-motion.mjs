@@ -157,8 +157,8 @@ try {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.reload();
   await root.waitFor();
-  await page.locator('[data-clinical-workflow][data-stage="1"]').waitFor();
-  await page.locator('[data-clinical-workflow][data-stage="2"]').waitFor();
+  await page.locator('[data-clinical-workflow][data-stage="1"]').waitFor({ timeout: 15000 });
+  await page.locator('[data-clinical-workflow][data-stage="2"]').waitFor({ timeout: 25000 });
   await page.locator("[data-clinical-report-panel]").waitFor();
   await settled();
   await screenshot("07-automatic-report");

@@ -1,6 +1,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import type { DemoCase } from "../types";
 import type { ExperienceData } from "../experience/types";
+import { clinicalPlaylist, CLINICAL_TIMING } from "./carousel";
 
 export interface PlaybackCommand {
   sequence: number;
@@ -17,6 +18,7 @@ export const evidenceKey = (item: DemoCase, metricId: string) =>
   item.kind === "function" ? (metricId === "esv" ? "es" : "ed") : metricId;
 
 export function useClinicalSession(cases: DemoCase[], data: ExperienceData) {
+  const playlist = clinicalPlaylist(cases, data.function.caseId);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const automatic = ref(!reduced.matches);
   const caseId = ref(data.function.caseId);
@@ -66,12 +68,12 @@ export function useClinicalSession(cases: DemoCase[], data: ExperienceData) {
     selectMetric(metricId.value);
   }
   function showPreview(index: number) {
-    const preview = data.playlist[index]!;
+    const preview = playlist[index]!;
     playlistIndex.value = index;
     reportOpen.value = false;
-    reviews[preview.caseId] = { analysed: false, confirmed: false };
-    caseId.value = preview.caseId;
-    metricId.value = preview.metric;
+    reviews[preview.id] = { analysed: false, confirmed: false };
+    caseId.value = preview.id;
+    metricId.value = preview.metrics[0]!.id;
     overlay.value = true;
     elapsed.value = 0;
     frame.value = 0;
@@ -97,9 +99,20 @@ export function useClinicalSession(cases: DemoCase[], data: ExperienceData) {
     timer = setInterval(() => {
       if (automatic.value) {
         elapsed.value++;
-        if (elapsed.value === 5) analyse();
-        if (elapsed.value === 8) reportOpen.value = true;
-        if (elapsed.value >= 12) showPreview((playlistIndex.value + 1) % data.playlist.length);
+        if (elapsed.value === CLINICAL_TIMING.analyse) analyse();
+        if (elapsed.value > CLINICAL_TIMING.analyse && elapsed.value < CLINICAL_TIMING.report) {
+          const offset = elapsed.value - CLINICAL_TIMING.analyse;
+          if (offset % CLINICAL_TIMING.metric === 0) {
+            const next =
+              item.value.metrics[
+                Math.min(Math.floor(offset / CLINICAL_TIMING.metric), item.value.metrics.length - 1)
+              ]!;
+            if (next.id !== metricId.value) selectMetric(next.id);
+          }
+        }
+        if (elapsed.value === CLINICAL_TIMING.report) reportOpen.value = true;
+        if (elapsed.value >= CLINICAL_TIMING.next)
+          showPreview((playlistIndex.value + 1) % playlist.length);
       } else if (!reduced.matches && Date.now() - lastActivity >= 120000) resume();
     }, 1000);
   });
@@ -116,6 +129,7 @@ export function useClinicalSession(cases: DemoCase[], data: ExperienceData) {
     frame,
     elapsed,
     playlistIndex,
+    playlist,
     reviews,
     item,
     metric,

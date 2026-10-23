@@ -98,7 +98,9 @@ function seek(target: number) {
   const position =
     (Math.max(0, Math.min(props.item.frameCount - 1, target)) + 0.1) / props.item.fps;
   seeking.value = Math.abs(video.value.currentTime - position) > 0.00001;
-  video.value.currentTime = position;
+  // EF and EDV can share the same evidence frame. Keep the decoded frame
+  // rather than asking a looping video to seek again at its final frame.
+  if (seeking.value) video.value.currentTime = position;
   update();
 }
 function apply(command: PlaybackCommand) {

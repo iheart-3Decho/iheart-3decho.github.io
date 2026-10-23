@@ -2,7 +2,7 @@
 
 ## 服務與路徑
 
-2026-10-23 更新為[臨床分析工作站](clinical-workstation.md)，包含流程動效與同頁量測報告；原展台保留在 `#/experience`。沿用六病例、七項指標及八段輪播，預設展示 EchoXFlow `recording_f253dc88013d7a95` 四腔心影片。選片與實際輸出見 [病例庫說明](case-library.md)。
+2026-10-23 更新為[臨床分析工作站](clinical-workstation.md)，包含流程動效與同頁量測報告。工作站共九例，每例 36 秒完整展示後換片，一圈不重複；新增三例 TED 完整週期與實際模型結果。預設展示 EchoXFlow `recording_f253dc88013d7a95` 四腔心影片。原六病例的展台與八段指標輪播保留在 `#/experience`，來源見 [病例庫說明](case-library.md)。
 
 - SSH：`ssh smarthealth@158.132.74.7 -p 12312`。
 - 網址：[iHeart STG 展台](http://158.132.74.7:8080/)。伺服器本機瀏覽器使用 `http://127.0.0.1:8080/`，網路斷開時仍可操作本機素材。
@@ -43,6 +43,8 @@ systemctl --user status iheart-caddy.service iheart-kiosk.service
 `public/demo-private/` 是未使用的早期本地素材，不作為本次網站入口；上傳時排除。伺服器首次傳輸產生的副本已移至 web root 之外的 `legacy-demo-private/` 保留，沒有刪除研究材料。
 
 ## 2026-10-23 工作站與手動啟動驗證
+
+同日後續更新為九病例、每例 36 秒；整圈與全部指標檢查通過，對部署網址的原生時間動效檢查通過。實際屏幕核對新 patient050 影片與量測報告、九例列表及 1920 × 1080 無溢出。此次截圖在遠端 `validation/20261023-nine-cases/`、本地 `private-source/clinical-validation/remote-nine-cases/`；更新前站點備份為 `backups/site-before-20261023-nine-cases.tgz`。更新後仍保持瀏覽器關閉、不自動啟動或重啟。
 
 - 本地 lint、資料檢查、TypeScript 與構建通過；遠端站點與本地 `dist/` 以 rsync checksum dry-run 核對一致，排除早期 `demo-private/`。
 - 對實際部署網址執行 `pnpm check:clinical-motion` 通過：原生時間動效、同頁報告、過渡中切換病例、減少動效及單屏排版均正常。

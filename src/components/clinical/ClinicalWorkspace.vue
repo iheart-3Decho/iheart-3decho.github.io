@@ -20,6 +20,7 @@ const {
   reportOpen,
   frame,
   playlistIndex,
+  playlist,
   reviews,
   item,
   metric,
@@ -120,7 +121,9 @@ function onInteraction(event: Event) {
             <h2 class="flex items-center gap-2 text-[14px] font-semibold">
               <Icon name="folder" :size="17" />檢查列表
             </h2>
-            <span class="rounded bg-canvas px-2 py-1 font-mono text-[10px] text-muted">06</span>
+            <span class="rounded bg-canvas px-2 py-1 font-mono text-[10px] text-muted">{{
+              String(cases.length).padStart(2, "0")
+            }}</span>
           </div>
           <div
             class="flex h-10 shrink-0 items-center gap-2 border-b border-line px-4 text-[10px] text-muted"
@@ -205,10 +208,7 @@ function onInteraction(event: Event) {
               </div>
               <span
                 class="rounded-full border border-line bg-white px-3 py-1.5 text-[10px] text-muted"
-                >{{
-                  automatic
-                    ? `自動演示 ${playlistIndex + 1} / ${data.playlist.length}`
-                    : "手動閱片"
+                >{{ automatic ? `自動演示 ${playlistIndex + 1} / ${playlist.length}` : "手動閱片"
                 }}<span class="ml-2 text-brand">{{
                   automatic
                     ? stage === 2

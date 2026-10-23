@@ -9,6 +9,13 @@ import type { DemoCase } from "./types";
 
 const cases = ref<DemoCase[]>([]);
 const experience = ref<ExperienceData>();
+const additions = ref<{ cases: DemoCase[]; library: ExperienceData["library"] }>();
+const clinicalCases = computed(() => [...cases.value, ...(additions.value?.cases ?? [])]);
+const clinicalData = computed(() =>
+  experience.value && additions.value
+    ? { ...experience.value, library: [...experience.value.library, ...additions.value.library] }
+    : undefined,
+);
 const experienceFailed = ref(false);
 const isBooth = computed(() => route.value === "#/experience");
 const isClinical = computed(() => route.value === "#/" || route.value === "#/clinical");
@@ -47,6 +54,22 @@ async function loadExperience() {
     )
       throw new Error("Invalid experience");
     experience.value = data;
+    const extraResponse = await fetch(
+      `${import.meta.env.BASE_URL}experience/clinical-additions.json`,
+    );
+    if (!extraResponse.ok) throw new Error("Missing clinical cases");
+    const extra = await extraResponse.json();
+    if (
+      !Array.isArray(extra.cases) ||
+      !extra.cases.length ||
+      !Array.isArray(extra.library) ||
+      extra.cases.some(
+        (item: DemoCase) =>
+          !extra.library.some((entry: { caseId: string }) => entry.caseId === item.id),
+      )
+    )
+      throw new Error("Invalid clinical cases");
+    additions.value = extra;
   } catch {
     experienceFailed.value = true;
   }
@@ -86,9 +109,9 @@ onBeforeUnmount(() => window.removeEventListener("hashchange", syncRoute));
 
 <template>
   <ClinicalWorkspace
-    v-if="isClinical && experience && cases.length"
-    :cases="cases"
-    :data="experience"
+    v-if="isClinical && clinicalData && cases.length"
+    :cases="clinicalCases"
+    :data="clinicalData"
   />
   <BoothPage v-else-if="isBooth && experience && cases.length" :cases="cases" :data="experience" />
   <main

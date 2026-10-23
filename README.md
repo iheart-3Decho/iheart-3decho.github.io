@@ -8,6 +8,8 @@
 
 預設 `#/` 與 `#/clinical` 為臨床分析工作站：檢查列表、大幅閱片、量測表、關鍵幀與報告預覽。選擇病例後，點「AI 分析」再點「生成報告」即可完成示範；確認量測為可選操作。操作方式及驗收見 [工作站說明](docs/clinical-workstation.md)。2026-10-23 已更新 STG 演示機，改用桌面快捷方式手動全螢幕啟動；GitHub Pages 本輪未更新。
 
+工作站現在提供九例；自動演示每例 36 秒（原片 8 秒、逐項量測 20 秒、報告 8 秒），完成後才換下一例，一圈不重複。三例新增 TED 素材獨立保存於 `public/experience/clinical-additions.json`；原展台和六個詳情入口保持不變。
+
 舊展台完整保留在 `#/experience`；原六入口展示在 `#/showcase`，原有 `#/case/…` 詳情連結繼續有效。舊展台操作、資料來源與連續運行驗收詳見 [展台操作說明](docs/booth-operation.md)。
 
 需要 Node.js 20.19+ 或 22.12+；準備影片時另需 `ffmpeg`、`ffprobe`。
