@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
     class="overflow-hidden rounded-2xl border border-line bg-white text-left shadow-[0_4px_20px_#213c4b05]"
   >
     <div
-      class="relative h-[170px] overflow-hidden xl:h-[170px]"
+      class="relative h-[185px] overflow-hidden xl:h-[185px]"
       :class="project.id === 'visualization' ? 'bg-[#0b1218]' : 'bg-[#e9eff1]'"
       aria-live="polite"
     >
@@ -96,19 +96,19 @@ onBeforeUnmount(() => {
         />
       </div>
     </div>
-    <div class="p-4 xl:px-5 xl:py-4">
+    <div class="p-3 xl:px-4 xl:py-3">
       <div class="flex items-center justify-between gap-2">
-        <h3 class="text-[22px] font-semibold tracking-tight">{{ project.title }}</h3>
-        <span class="grid size-9 place-items-center rounded-full bg-[#eff7f6] text-brand"
+        <h3 class="text-[20px] font-semibold tracking-tight">{{ project.title }}</h3>
+        <span class="grid size-8 place-items-center rounded-full bg-[#eff7f6] text-brand"
           ><Icon :name="project.icon" :size="18"
         /></span>
       </div>
-      <p class="mt-2 text-[14px] leading-relaxed text-muted">{{ project.question }}</p>
-      <div class="mt-3 flex flex-wrap gap-2">
+      <p class="mt-1 text-[12px] leading-relaxed text-muted">{{ project.question }}</p>
+      <div class="mt-2 flex flex-wrap gap-1.5">
         <span
           v-for="tag in project.tags"
           :key="tag"
-          class="rounded-md bg-[#f2f6f7] px-2 py-1 text-[11px] text-[#59717c]"
+          class="rounded-md bg-[#f2f6f7] px-2 py-0.5 text-[10px] text-[#59717c]"
           >{{ tag }}</span
         >
       </div>

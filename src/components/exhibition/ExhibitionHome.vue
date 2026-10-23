@@ -32,6 +32,7 @@ onMounted(() => {
   document.title = "iHeart — 心臟超聲 · 三維視覺化與智能分析";
   reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
   reduceMotion.addEventListener("change", motionChange);
+  void play();
 });
 onBeforeUnmount(() => {
   pause();
@@ -74,9 +75,9 @@ onBeforeUnmount(() => {
       </div>
     </header>
 
-    <main class="w-full px-6 pt-7 pb-5 lg:px-10 lg:pt-9">
+    <main class="w-full px-6 pt-3 pb-1 lg:px-10 lg:pt-3">
       <section
-        class="grid items-center gap-8 lg:grid-cols-[.85fr_1.15fr] lg:gap-12"
+        class="grid items-center gap-7 lg:grid-cols-[1.1fr_.9fr] lg:gap-8"
         aria-labelledby="exhibition-title"
       >
         <div class="py-3 lg:py-6">
@@ -127,13 +128,14 @@ onBeforeUnmount(() => {
               ><span class="size-1.5 rounded-full bg-[#77c5b6]" />iHeart · 三項研究完整介紹</span
             ><span>03:23</span>
           </div>
-          <div class="relative aspect-[16/9] lg:aspect-auto lg:h-[335px] xl:h-[350px]">
+          <div class="relative aspect-[16/9]">
             <video
               v-show="!failed"
               ref="hero"
               :src="exhibitionAsset('iheart-overview.mp4')"
               :poster="exhibitionAsset('overview-poster.jpg')"
               aria-label="iHeart 三項研究完整介紹影片"
+              autoplay
               controls
               loop
               muted
@@ -183,9 +185,9 @@ onBeforeUnmount(() => {
         id="exhibition-projects"
         tabindex="-1"
         aria-labelledby="projects-title"
-        class="mt-7 scroll-mt-5 outline-none"
+        class="mt-4 scroll-mt-5 outline-none"
       >
-        <div class="mb-5 flex items-end justify-between gap-4">
+        <div class="mb-3 flex items-end justify-between gap-4">
           <div>
             <p class="mb-2 text-[10px] font-semibold tracking-[.2em] text-brand">
               EXPLORE THE DEMOS
@@ -207,14 +209,5 @@ onBeforeUnmount(() => {
         </div>
       </section>
     </main>
-    <footer
-      class="flex w-full flex-wrap items-center justify-between gap-3 px-6 py-3 text-[11px] text-muted lg:px-10"
-    >
-      <span>iHeart · 3D Analysis &amp; Visualization</span
-      ><span>心臟超聲研究演示 · 視覺化、結構辨識與影片量測</span
-      ><a href="#/clinical" class="flex items-center gap-1 hover:text-brand"
-        >互動工作站<Icon name="arrow" :size="13"
-      /></a>
-    </footer>
   </div>
 </template>

@@ -71,13 +71,12 @@ try {
   await loadedVideo(preview);
   assert.ok((await preview.getAttribute("src")).endsWith("/exhibition/iheart-overview.mp4"));
   assert.ok((await preview.evaluate((video) => video.duration)) > 200);
-  assert.equal(await preview.evaluate((video) => video.paused), true);
+  await page.waitForFunction(() => !document.querySelector("main video")?.paused);
+  assert.equal(await preview.evaluate((video) => video.paused), false);
   assert.ok((await preview.getAttribute("poster")).endsWith("/exhibition/overview-poster.jpg"));
-  await page.getByRole("button", { name: "播放首頁影片" }).click();
-  await page.waitForFunction(() => !document.querySelector("main video").paused);
+  await screenshot("01-gallery-desktop.png");
   await page.getByRole("button", { name: "暫停首頁影片" }).click();
   assert.equal(await preview.evaluate((video) => video.paused), true);
-  await screenshot("01-gallery-desktop.png");
 
   for (const project of ["visualization", "segmentation", "analysis"]) {
     const card = page.locator(`[data-project="${project}"]`);
