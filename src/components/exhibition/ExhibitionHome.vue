@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { exhibitionAsset, projects, type ExhibitionProject } from "../../exhibition/projects";
+import { exhibitionAsset, projects } from "../../exhibition/projects";
 import Icon from "../Icon.vue";
 import ProjectCard from "./ProjectCard.vue";
-import ExhibitionDialog from "./ExhibitionDialog.vue";
 
-const selected = ref<ExhibitionProject>();
-const intro = ref(false);
 const hero = ref<HTMLVideoElement>();
 const playing = ref(false);
-let resumeAfterDialog = false;
 const failed = ref(false);
 let reduceMotion: MediaQueryList | undefined;
 const oldTitle = document.title;
@@ -23,20 +19,8 @@ async function play() {
     playing.value = false;
   }
 }
-function select(project: ExhibitionProject) {
-  resumeAfterDialog = playing.value;
-  pause();
-  selected.value = project;
-}
-function showIntro() {
-  resumeAfterDialog = playing.value;
-  pause();
-  intro.value = true;
-}
-function close() {
-  selected.value = undefined;
-  intro.value = false;
-  if (resumeAfterDialog && !reduceMotion?.matches) void play();
+function playHero() {
+  void play();
 }
 function motionChange() {
   if (reduceMotion?.matches) pause();
@@ -65,9 +49,7 @@ onBeforeUnmount(() => {
       >跳至三項演示</a
     >
     <header class="border-b border-line bg-white/85">
-      <div
-        class="mx-auto flex h-[76px] max-w-[1824px] items-center justify-between gap-5 px-5 lg:px-10"
-      >
+      <div class="flex h-[76px] items-center justify-between gap-5 px-6 lg:px-10">
         <a href="#/" class="flex items-center gap-3" aria-label="iHeart 展示首頁"
           ><span
             class="grid size-10 place-items-center rounded-xl bg-brand text-white shadow-[0_4px_12px_#147e7d20]"
@@ -84,7 +66,7 @@ onBeforeUnmount(() => {
           >
           <button
             class="flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2.5 text-[12px] font-medium hover:bg-canvas md:px-4"
-            @click="showIntro"
+            @click="playHero"
           >
             <Icon name="play" :size="14" /><span>觀看介紹影片</span>
           </button>
@@ -92,7 +74,7 @@ onBeforeUnmount(() => {
       </div>
     </header>
 
-    <main class="mx-auto max-w-[1824px] px-5 pt-7 pb-5 lg:px-10 lg:pt-9">
+    <main class="w-full px-6 pt-7 pb-5 lg:px-10 lg:pt-9">
       <section
         class="grid items-center gap-8 lg:grid-cols-[.85fr_1.15fr] lg:gap-12"
         aria-labelledby="exhibition-title"
@@ -116,7 +98,7 @@ onBeforeUnmount(() => {
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <button
               class="flex items-center gap-3 rounded-xl bg-brand px-5 py-3.5 text-[14px] font-semibold text-white shadow-[0_6px_20px_#147e7d20] hover:bg-[#126d6c]"
-              @click="showIntro"
+              @click="playHero"
             >
               <Icon name="play" :size="17" />觀看完整介紹
             </button>
@@ -145,7 +127,7 @@ onBeforeUnmount(() => {
               ><span class="size-1.5 rounded-full bg-[#77c5b6]" />iHeart · 三項研究完整介紹</span
             ><span>03:23</span>
           </div>
-          <div class="relative aspect-[16/9] lg:aspect-auto lg:h-[335px] xl:h-[410px]">
+          <div class="relative aspect-[16/9] lg:aspect-auto lg:h-[335px] xl:h-[350px]">
             <video
               v-show="!failed"
               ref="hero"
@@ -213,7 +195,7 @@ onBeforeUnmount(() => {
             </h2>
           </div>
           <p class="hidden text-[12px] text-muted sm:block">
-            選一項演示，查看實際影像與研究成果<Icon
+            三項 demo 自動輪播，查看影像與研究成果<Icon
               name="arrow"
               :size="15"
               class="ml-2 inline-block align-middle"
@@ -221,17 +203,12 @@ onBeforeUnmount(() => {
           </p>
         </div>
         <div class="grid gap-5 md:grid-cols-3">
-          <ProjectCard
-            v-for="project in projects"
-            :key="project.id"
-            :project="project"
-            @select="select"
-          />
+          <ProjectCard v-for="project in projects" :key="project.id" :project="project" />
         </div>
       </section>
     </main>
     <footer
-      class="mx-auto flex max-w-[1824px] flex-wrap items-center justify-between gap-3 px-5 py-3 text-[11px] text-muted lg:px-10"
+      class="flex w-full flex-wrap items-center justify-between gap-3 px-6 py-3 text-[11px] text-muted lg:px-10"
     >
       <span>iHeart · 3D Analysis &amp; Visualization</span
       ><span>心臟超聲研究演示 · 視覺化、結構辨識與影片量測</span
@@ -239,6 +216,5 @@ onBeforeUnmount(() => {
         >互動工作站<Icon name="arrow" :size="13"
       /></a>
     </footer>
-    <ExhibitionDialog v-if="selected || intro" :project="selected" :intro="intro" @close="close" />
   </div>
 </template>

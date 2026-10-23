@@ -1,48 +1,110 @@
 <script setup lang="ts">
-import { exhibitionAsset, type ExhibitionProject } from "../../exhibition/projects";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  exhibitionAsset,
+  type ExhibitionMedia,
+  type ExhibitionProject,
+} from "../../exhibition/projects";
 import Icon from "../Icon.vue";
-defineProps<{ project: ExhibitionProject }>();
-defineEmits<{ select: [project: ExhibitionProject] }>();
+
+const props = defineProps<{ project: ExhibitionProject }>();
+const active = ref(0);
+const failed = ref(false);
+let timer: number | undefined;
+const current = () => props.project.media[active.value]!;
+
+function advance() {
+  active.value = (active.value + 1) % props.project.media.length;
+  failed.value = false;
+}
+function mediaStyle(_media: ExhibitionMedia) {
+  return "object-contain";
+}
+onMounted(() => {
+  timer = window.setInterval(advance, 5200);
+});
+onBeforeUnmount(() => {
+  if (timer) window.clearInterval(timer);
+});
 </script>
 
 <template>
-  <button
+  <article
     :data-project="project.id"
-    :aria-label="`探索${project.title}`"
-    class="group overflow-hidden rounded-2xl border border-line bg-white text-left shadow-[0_4px_20px_#213c4b05] transition duration-300 hover:-translate-y-1 hover:border-brand/35 hover:shadow-[0_15px_30px_#213c4b10]"
-    @click="$emit('select', project)"
+    class="overflow-hidden rounded-2xl border border-line bg-white text-left shadow-[0_4px_20px_#213c4b05]"
   >
     <div
-      class="relative h-[194px] overflow-hidden xl:h-[140px]"
+      class="relative h-[170px] overflow-hidden xl:h-[170px]"
       :class="project.id === 'visualization' ? 'bg-[#0b1218]' : 'bg-[#e9eff1]'"
+      aria-live="polite"
     >
-      <img
-        :src="exhibitionAsset(project.poster)"
-        :alt="project.media[0]!.alt"
-        class="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.035]"
-      />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-      <span
+      <div :key="`${current().src}-${active}`" class="h-full w-full animate-enter">
+        <video
+          v-if="current().type === 'video'"
+          :src="exhibitionAsset(current().src)"
+          :poster="current().poster ? exhibitionAsset(current().poster!) : undefined"
+          :aria-label="current().alt"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          :class="mediaStyle(current())"
+          class="h-full w-full"
+          @error="failed = true"
+        />
+        <img
+          v-else
+          :src="exhibitionAsset(current().src)"
+          :alt="current().alt"
+          :class="mediaStyle(current())"
+          class="h-full w-full"
+          @error="failed = true"
+        />
+      </div>
+      <div
+        v-if="failed"
+        class="absolute inset-0 grid place-items-center bg-[#0b1218] text-[12px] text-white"
+      >
+        <button
+          class="rounded-lg bg-white/15 px-4 py-2 hover:bg-white/25"
+          @click="
+            failed = false;
+            advance();
+          "
+        >
+          重新載入素材
+        </button>
+      </div>
+      <div
         class="absolute top-3 left-3 rounded-lg bg-white/95 px-2.5 py-1.5 text-[12px] font-semibold tracking-wider text-ink"
-        >DEMO {{ project.number }}</span
       >
-      <span
-        class="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[12px] font-semibold text-brand"
-        ><Icon :name="project.id === 'visualization' ? 'play' : 'scan'" :size="14" />{{
-          project.id === "visualization" ? "觀看影片" : "查看演示"
-        }}</span
+        DEMO {{ project.number }}
+      </div>
+      <div
+        class="absolute right-3 bottom-3 flex items-center gap-2 rounded-full bg-black/55 px-3 py-1.5 text-[11px] text-white backdrop-blur-sm"
       >
+        {{ current().label }}
+        <span class="text-white/60">{{ active + 1 }}/{{ project.media.length }}</span>
+      </div>
+      <div class="absolute bottom-3 left-3 flex gap-1.5" aria-label="自動輪播進度">
+        <span
+          v-for="(_, index) in project.media"
+          :key="index"
+          :class="index === active ? 'w-5 bg-white' : 'w-1.5 bg-white/50'"
+          class="h-1.5 rounded-full transition-all duration-300"
+        />
+      </div>
     </div>
-    <div class="p-5 xl:px-6 xl:py-5">
+    <div class="p-4 xl:px-5 xl:py-4">
       <div class="flex items-center justify-between gap-2">
         <h3 class="text-[22px] font-semibold tracking-tight">{{ project.title }}</h3>
-        <span
-          class="grid size-9 place-items-center rounded-full bg-[#eff7f6] text-brand transition group-hover:bg-brand group-hover:text-white"
-          ><Icon name="arrow" :size="18"
+        <span class="grid size-9 place-items-center rounded-full bg-[#eff7f6] text-brand"
+          ><Icon :name="project.icon" :size="18"
         /></span>
       </div>
       <p class="mt-2 text-[14px] leading-relaxed text-muted">{{ project.question }}</p>
-      <div class="mt-4 flex flex-wrap gap-2">
+      <div class="mt-3 flex flex-wrap gap-2">
         <span
           v-for="tag in project.tags"
           :key="tag"
@@ -51,5 +113,5 @@ defineEmits<{ select: [project: ExhibitionProject] }>();
         >
       </div>
     </div>
-  </button>
+  </article>
 </template>
